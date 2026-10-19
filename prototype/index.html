@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCRM | Intelligent CRM & Agentic AI Platform</title>
+  <meta name="description" content="Next-generation intelligent CRM integrating customer analytics, sales pipeline automation, and agentic AI for predictive customer relationship management.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/layout.css">
+  <link rel="stylesheet" href="./styles/components.css">
+  <link rel="stylesheet" href="./styles/kanban.css">
+  <link rel="stylesheet" href="./styles/analytics.css">
+  <link rel="stylesheet" href="./styles/copilot.css">
+</head>
+<body class="dark-theme">
+  <div id="app" class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Smart<span class="gradient-text">CRM</span></span>
+          <span class="brand-badge">AGENTIC AI</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">CORE PLATFORM</div>
+        <button class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span class="nav-label">Dashboard</span>
+        </button>
+
+        <button class="nav-item" data-view="customers" id="nav-customers">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="nav-label">Customers</span>
+          <span class="nav-badge" id="customers-count-badge">12</span>
+        </button>
+
+        <button class="nav-item" data-view="pipeline" id="nav-pipeline">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span class="nav-label">Deals Pipeline</span>
+          <span class="nav-badge highlight" id="pipeline-count-badge">8</span>
+        </button>
+
+        <button class="nav-item" data-view="activities" id="nav-activities">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="nav-label">Follow-ups & Tasks</span>
+          <span class="nav-badge warning" id="tasks-overdue-badge">2</span>
+        </button>
+
+        <button class="nav-item" data-view="analytics" id="nav-analytics">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span class="nav-label">Customer Analytics</span>
+        </button>
+
+        <div class="nav-section-title">INTELLIGENCE</div>
+        <button class="nav-item special-ai" id="btn-open-copilot-nav">
+          <div class="ai-sparkle-dot"></div>
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          <span class="nav-label">Agentic Copilot</span>
+          <span class="pulse-indicator"></span>
+        </button>
+      </nav>
+
+      <div class="sidebar-ai-card">
+        <div class="ai-card-header">
+          <div class="ai-pulse-ring"></div>
+          <span class="ai-card-title">SmartAgent Active</span>
+        </div>
+        <p class="ai-card-desc">Monitoring 12 accounts, 4 signals detected today.</p>
+        <button class="btn-sidebar-audit" id="btn-trigger-ai-audit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Run AI Health Audit</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="user-avatar">
+            <span>AR</span>
+            <span class="online-indicator"></span>
+          </div>
+          <div class="user-info">
+            <span class="user-name">Alex Rivera</span>
+            <span class="user-role">VP of Sales Ops</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="btn-icon mobile-menu-toggle" id="btn-toggle-sidebar" aria-label="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="global-search-input" placeholder="Search customers, deals, activities... (Press /)" autocomplete="off">
+            <kbd class="search-shortcut">/</kbd>
+            <div id="search-dropdown" class="search-dropdown hidden"></div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- AI Copilot quick button -->
+          <button class="btn-ai-pill" id="btn-topbar-copilot">
+            <span class="ai-sparkle-dot"></span>
+            <span>Ask SmartAgent</span>
+          </button>
+
+          <!-- AI Engine Settings Button -->
+          <button class="btn-icon" id="btn-topbar-ai-settings" title="AI Engine & Key Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          </button>
+
+          <!-- Quick Create Dropdown -->
+          <div class="dropdown-wrapper">
+            <button class="btn btn-primary" id="btn-quick-create">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Create New</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dropdown-menu hidden" id="quick-create-menu">
+              <button class="dropdown-item" id="btn-new-customer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                <span>New Customer</span>
+              </button>
+              <button class="dropdown-item" id="btn-new-deal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span>New Deal</span>
+              </button>
+              <button class="dropdown-item" id="btn-new-activity">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>New Activity / Follow-up</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Settings & Data Options -->
+          <div class="dropdown-wrapper">
+            <button class="btn-icon" id="btn-data-menu" title="System Settings & Data">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+            <div class="dropdown-menu right hidden" id="data-dropdown-menu">
+              <button class="dropdown-item" id="btn-export-data">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Export CRM Data (JSON)</span>
+              </button>
+              <button class="dropdown-item text-danger" id="btn-reset-demo-data">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                <span>Reset to Sample Data</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Dynamic Content Container -->
+      <main id="main-content" class="main-content">
+        <!-- Rendered view goes here -->
+      </main>
+    </div>
+
+    <!-- 360° Customer Profile Drawer -->
+    <div id="customer-drawer-backdrop" class="drawer-backdrop hidden"></div>
+    <aside id="customer-drawer" class="drawer customer-drawer hidden">
+      <!-- Injected by CustomersView -->
+    </aside>
+
+    <!-- Agentic AI Copilot Drawer -->
+    <div id="copilot-drawer-backdrop" class="drawer-backdrop hidden"></div>
+    <aside id="copilot-drawer" class="drawer copilot-drawer hidden">
+      <!-- Injected by AICopilotDrawer -->
+    </aside>
+
+    <!-- Modal Overlays -->
+    <div id="modal-container" class="modal-backdrop hidden">
+      <div id="modal-content" class="modal-box">
+        <!-- Dynamic Modal Content -->
+      </div>
+    </div>
+
+    <!-- Floating AI Sparkle Trigger Button -->
+    <button class="floating-ai-fab" id="btn-floating-copilot" title="Open SmartAgent Copilot">
+      <div class="fab-pulse"></div>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+    </button>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

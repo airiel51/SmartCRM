@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+backend/venv/
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+
+# Environment and secrets (CRITICAL)
+.env
+.env.*
+*.env
+frontend/.env
+*.local
+
+# Databases & local binary files
+*.db
+*.sqlite
+*.sqlite3
+smartcrm.db
+backend/smartcrm.db
+
+# Logs & OS files
+*.log
+.DS_Store
+Thumbs.db
+

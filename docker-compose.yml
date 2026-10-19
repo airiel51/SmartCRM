@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Relational Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: smartcrm_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: smartcrm_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d smartcrm_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend Service with Scikit-Learn & LangGraph AI Layer
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smartcrm_backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/smartcrm_db
+      USE_SQLITE_FALLBACK: "False"
+      PROJECT_NAME: SmartCRM
+      API_V1_STR: /api/v1
+      SECRET_KEY: smartcrm-super-secret-key-production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  # React Frontend Dashboard Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smartcrm_frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
