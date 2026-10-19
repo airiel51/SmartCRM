@@ -67,14 +67,14 @@ class _MainFloorNavigationState extends State<MainFloorNavigation> {
         data: NavigationBarThemeData(
           backgroundColor: const Color(0xFF1E293B),
           indicatorColor: Colors.amber.withOpacity(0.2),
-          labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>((states) {
-            if (states.contains(MaterialState.selected)) {
+          labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
+            if (states.contains(WidgetState.selected)) {
               return const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold);
             }
             return const TextStyle(color: Colors.white54, fontSize: 11);
           }),
-          iconTheme: MaterialStateProperty.resolveWith<IconThemeData>((states) {
-            if (states.contains(MaterialState.selected)) {
+          iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
+            if (states.contains(WidgetState.selected)) {
               return const IconThemeData(color: Colors.amber, size: 22);
             }
             return const IconThemeData(color: Colors.white54, size: 22);

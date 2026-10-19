@@ -199,11 +199,12 @@ class _IntakeScreenState extends State<IntakeScreen> {
             // Section 3: 5-Point Floor Walkaround Inspection
             _buildSectionHeader('3. 5-POINT WALKAROUND CHECKLIST'),
             const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+            Material(
+              color: const Color(0xFF1E293B),
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white12),
+                side: const BorderSide(color: Colors.white12),
               ),
               child: Column(
                 children: [
