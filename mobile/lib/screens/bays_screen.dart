@@ -66,7 +66,7 @@ class _BaysScreenState extends State<BaysScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${s.vehiclePlate} ➔ $nextStage'),
+            content: Text('${s.vehiclePlate} updated to $nextStage'),
             backgroundColor: nextStage == 'Ready for Pickup' ? const Color(0xFF10B981) : Colors.amber.shade700,
             duration: const Duration(seconds: 2),
           ),
@@ -77,9 +77,8 @@ class _BaysScreenState extends State<BaysScreen> {
 
   void _notifyCustomerReady(ServiceOrderModel s) {
     final msg = "Hello ${s.customerName}! Your car (${s.vehiclePlate}) is ready for collection at Apex AutoWorks. Service: ${s.serviceType}. Thank you!";
-    // Find phone from customer or prompt
     WhatsAppLauncher.openChat(
-      phone: "+60165542190", // default Malaysian format
+      phone: "+60165542190",
       message: msg,
     );
     ScaffoldMessenger.of(context).showSnackBar(
@@ -92,7 +91,6 @@ class _BaysScreenState extends State<BaysScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Organize by 4 physical bays
     final allBays = ['Bay 1', 'Bay 2', 'Bay 3', 'Bay 4'];
     final activeOrders = _services.where((s) => s.stage != 'Invoiced').toList();
     final occupiedCount = activeOrders.map((s) => s.serviceBay).toSet().length;
@@ -106,11 +104,11 @@ class _BaysScreenState extends State<BaysScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Workshop Bays',
+              'Apex AutoWorks',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             Text(
-              '$occupiedCount of 4 bays occupied',
+              '$occupiedCount of 4 bays in use',
               style: const TextStyle(fontSize: 12, color: Colors.amber, fontWeight: FontWeight.w600),
             ),
           ],
@@ -130,7 +128,6 @@ class _BaysScreenState extends State<BaysScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 children: allBays.map((bayName) {
-                  // Find current active car in this bay
                   final order = activeOrders.firstWhere(
                     (s) => s.serviceBay.toLowerCase().trim() == bayName.toLowerCase().trim(),
                     orElse: () => ServiceOrderModel(
@@ -163,28 +160,28 @@ class _BaysScreenState extends State<BaysScreen> {
     if (!isOccupied) {
       badgeBg = Colors.green.withOpacity(0.15);
       badgeText = const Color(0xFF34D399);
-      statusLabel = 'AVAILABLE';
+      statusLabel = 'Available';
     } else {
       switch (s.stage) {
         case 'In Progress':
           badgeBg = Colors.amber.withOpacity(0.2);
           badgeText = Colors.amber;
-          statusLabel = 'WORKING';
+          statusLabel = 'In Service';
           break;
         case 'Quality Inspection':
           badgeBg = Colors.blue.withOpacity(0.2);
           badgeText = Colors.lightBlueAccent;
-          statusLabel = 'QC INSPECT';
+          statusLabel = 'Final Check';
           break;
         case 'Ready for Pickup':
           badgeBg = const Color(0xFF10B981).withOpacity(0.2);
           badgeText = const Color(0xFF34D399);
-          statusLabel = 'READY';
+          statusLabel = 'Ready';
           break;
         default:
           badgeBg = Colors.purple.withOpacity(0.2);
           badgeText = Colors.purpleAccent;
-          statusLabel = 'SCHEDULED';
+          statusLabel = 'Waiting';
       }
     }
 
@@ -254,7 +251,6 @@ class _BaysScreenState extends State<BaysScreen> {
             const SizedBox(height: 12),
 
             if (!isOccupied)
-              // Empty bay state - Simple clean 1 tap to assign
               InkWell(
                 onTap: () {
                   if (widget.onNavigateTab != null) {
@@ -268,7 +264,7 @@ class _BaysScreenState extends State<BaysScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white10, style: BorderStyle.solid),
+                    border: Border.all(color: Colors.white10),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -276,7 +272,7 @@ class _BaysScreenState extends State<BaysScreen> {
                       const Icon(Icons.add_circle_outline_rounded, color: Colors.amber, size: 18),
                       const SizedBox(width: 8),
                       Text(
-                        'Check-In Car to $bayName',
+                        'Assign Car to $bayName',
                         style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w600, fontSize: 13),
                       ),
                     ],
@@ -288,7 +284,6 @@ class _BaysScreenState extends State<BaysScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // License Plate - Big and prominent!
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
@@ -346,7 +341,7 @@ class _BaysScreenState extends State<BaysScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () => _notifyCustomerReady(s),
                         icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
-                        label: const Text('WhatsApp Owner', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                        label: const Text('WhatsApp Customer', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF10B981),
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -364,7 +359,7 @@ class _BaysScreenState extends State<BaysScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: const Text('Release Bay', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        child: const Text('Clear Bay', style: TextStyle(color: Colors.white70, fontSize: 12)),
                       ),
                     ),
                   ],
@@ -383,7 +378,7 @@ class _BaysScreenState extends State<BaysScreen> {
                       s.stage == 'Scheduled'
                           ? 'Start Work in $bayName ➔'
                           : s.stage == 'In Progress'
-                              ? 'Mark QC Inspection ➔'
+                              ? 'Move to Final Check ➔'
                               : 'Mark Ready for Pickup ➔',
                       style: TextStyle(
                         color: s.stage == 'In Progress' ? Colors.white : Colors.black87,

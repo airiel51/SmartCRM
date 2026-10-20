@@ -5,16 +5,16 @@ import 'screens/retention_screen.dart';
 import 'screens/fleet_screen.dart';
 
 void main() {
-  runApp(const SmartCRMMobileApp());
+  runApp(const ApexAutoWorksApp());
 }
 
-class SmartCRMMobileApp extends StatelessWidget {
-  const SmartCRMMobileApp({Key? key}) : super(key: key);
+class ApexAutoWorksApp extends StatelessWidget {
+  const ApexAutoWorksApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SmartCRM Floor PIC',
+      title: 'Apex AutoWorks',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -28,19 +28,19 @@ class SmartCRMMobileApp extends StatelessWidget {
         fontFamily: 'Inter',
         useMaterial3: true,
       ),
-      home: const MainFloorNavigation(),
+      home: const MainWorkshopNavigation(),
     );
   }
 }
 
-class MainFloorNavigation extends StatefulWidget {
-  const MainFloorNavigation({Key? key}) : super(key: key);
+class MainWorkshopNavigation extends StatefulWidget {
+  const MainWorkshopNavigation({Key? key}) : super(key: key);
 
   @override
-  State<MainFloorNavigation> createState() => _MainFloorNavigationState();
+  State<MainWorkshopNavigation> createState() => _MainWorkshopNavigationState();
 }
 
-class _MainFloorNavigationState extends State<MainFloorNavigation> {
+class _MainWorkshopNavigationState extends State<MainWorkshopNavigation> {
   int _currentIndex = 0;
   String? _preselectedBay;
 
@@ -57,7 +57,7 @@ class _MainFloorNavigationState extends State<MainFloorNavigation> {
       BaysScreen(onNavigateTab: _navigateTab),
       IntakeScreen(
         initialBay: _preselectedBay,
-        onIntakeCreated: () => _navigateTab(0), // return to Bays screen after check-in
+        onIntakeCreated: () => _navigateTab(0),
       ),
       const RetentionScreen(),
       const FleetScreen(),
@@ -102,12 +102,12 @@ class _MainFloorNavigationState extends State<MainFloorNavigation> {
             NavigationDestination(
               icon: Icon(Icons.chat_bubble_outline_rounded),
               selectedIcon: Icon(Icons.chat_bubble_rounded),
-              label: 'WhatsApp',
+              label: 'Reminders',
             ),
             NavigationDestination(
-              icon: Icon(Icons.search_rounded),
-              selectedIcon: Icon(Icons.person_search_rounded),
-              label: 'Directory',
+              icon: Icon(Icons.people_outline_rounded),
+              selectedIcon: Icon(Icons.people_rounded),
+              label: 'Customers',
             ),
           ],
         ),

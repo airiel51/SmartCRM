@@ -16,13 +16,13 @@ class _IntakeScreenState extends State<IntakeScreen> {
   final _plateCtrl = TextEditingController();
   final _customerNameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-  final _symptomsCtrl = TextEditingController();
+  final _notesCtrl = TextEditingController();
 
   String _selectedBay = 'Bay 1';
-  String _selectedService = 'Standard 10,000 km Service';
+  String _selectedService = 'Regular Oil Service';
   bool _isSubmitting = false;
 
-  // 5-Point Walkaround Quick Toggles (all default to true for speed)
+  // 5-Point Walkaround Quick Toggles
   bool _bodyOk = true;
   bool _tiresOk = true;
   bool _oilOk = true;
@@ -30,10 +30,10 @@ class _IntakeScreenState extends State<IntakeScreen> {
   bool _batteryOk = true;
 
   final List<String> _servicePresets = [
-    'Standard 10,000 km Service',
-    'Brake Pad & Disc Overhaul',
-    'Aircond Inspection & Gas Refill',
-    'Engine Diagnosis & Tune-Up',
+    'Regular Oil Service',
+    'Brake Service',
+    'Aircond Service',
+    'Major Inspection',
   ];
 
   @override
@@ -44,29 +44,18 @@ class _IntakeScreenState extends State<IntakeScreen> {
     }
   }
 
-  void _fillSample(String plate, String name, String phone, String service, String bay) {
-    setState(() {
-      _plateCtrl.text = plate;
-      _customerNameCtrl.text = name;
-      _phoneCtrl.text = phone;
-      _selectedService = service;
-      _selectedBay = bay;
-      _symptomsCtrl.text = "Regular scheduled maintenance & general checkup.";
-    });
-  }
-
   Future<void> _submitIntake() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSubmitting = true);
 
     final checklist = [
-      _bodyOk ? 'Body: OK' : 'Body: Scratched',
+      _bodyOk ? 'Paint: OK' : 'Paint: Scratched',
       _tiresOk ? 'Tires: OK' : 'Tires: Worn',
       _oilOk ? 'Oil: OK' : 'Oil: Low',
       _brakesOk ? 'Brakes: OK' : 'Brakes: Low',
       _batteryOk ? 'Battery: OK' : 'Battery: Weak',
-    ].join('; ');
+    ].join(', ');
 
     final success = await ApiService.createVehicleIntake(
       fullName: _customerNameCtrl.text.trim(),
@@ -75,7 +64,9 @@ class _IntakeScreenState extends State<IntakeScreen> {
       make: 'Vehicle',
       model: _selectedService,
       mileage: 35000,
-      symptoms: '${_symptomsCtrl.text.trim()} | Inspection: $checklist',
+      symptoms: _notesCtrl.text.trim().isNotEmpty
+          ? '${_notesCtrl.text.trim()} ($checklist)'
+          : checklist,
       bay: _selectedBay,
       estimatedCost: 250.00,
     );
@@ -86,7 +77,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✓ ${_plateCtrl.text.toUpperCase()} checked in to $_selectedBay!'),
+            content: Text('✓ ${_plateCtrl.text.toUpperCase()} checked in to $_selectedBay'),
             backgroundColor: const Color(0xFF10B981),
           ),
         );
@@ -94,7 +85,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Check-in failed. Please verify network connection.'),
+            content: Text('Unable to complete check-in. Please try again.'),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -110,7 +101,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
         title: const Text(
-          'Quick Vehicle Check-In',
+          'Vehicle Check-In',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
@@ -119,36 +110,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           children: [
-            // Quick Fill Presets row for easy testing
-            Row(
-              children: [
-                const Text('Quick Demo:', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                const SizedBox(width: 8),
-                InkWell(
-                  onTap: () => _fillSample('VAB 2020', 'Priya Subramaniam', '+60 16-554 2190', 'Brake Pad & Disc Overhaul', 'Bay 1'),
-                  borderRadius: BorderRadius.circular(6),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.amber.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-                    child: const Text('VAB 2020 (Proton)', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                InkWell(
-                  onTap: () => _fillSample('PNG 4419', 'Tan Wei Ming', '+60 17-882 1902', 'Standard 10,000 km Service', 'Bay 2'),
-                  borderRadius: BorderRadius.circular(6),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.blue.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-                    child: const Text('PNG 4419 (Honda)', style: TextStyle(color: Colors.lightBlueAccent, fontSize: 11, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Card 1: Car & Owner Info
+            // Card 1: Car & Customer
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -159,7 +121,10 @@ class _IntakeScreenState extends State<IntakeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('CAR & OWNER', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                  const Text(
+                    'CAR & CUSTOMER',
+                    style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8),
+                  ),
                   const SizedBox(height: 12),
                   // Plate number input
                   TextFormField(
@@ -177,7 +142,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                     ),
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter plate number' : null,
                   ),
                   const SizedBox(height: 10),
                   // Customer Name
@@ -187,13 +152,15 @@ class _IntakeScreenState extends State<IntakeScreen> {
                     decoration: InputDecoration(
                       labelText: 'Customer Name',
                       labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
+                      hintText: 'e.g. Ahmad Razali',
+                      hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
                       prefixIcon: const Icon(Icons.person_outline, color: Colors.white38),
                       filled: true,
                       fillColor: const Color(0xFF0F172A),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                     ),
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter customer name' : null,
                   ),
                   const SizedBox(height: 10),
                   // Phone Number
@@ -202,15 +169,17 @@ class _IntakeScreenState extends State<IntakeScreen> {
                     keyboardType: TextInputType.phone,
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                     decoration: InputDecoration(
-                      labelText: 'WhatsApp Phone Number',
+                      labelText: 'Contact Phone Number',
                       labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
-                      prefixIcon: const Icon(Icons.phone_android_outlined, color: Colors.greenAccent),
+                      hintText: 'e.g. 012-345 6789',
+                      hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
+                      prefixIcon: const Icon(Icons.phone_outlined, color: Colors.greenAccent),
                       filled: true,
                       fillColor: const Color(0xFF0F172A),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                     ),
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter phone number' : null,
                   ),
                 ],
               ),
@@ -229,7 +198,10 @@ class _IntakeScreenState extends State<IntakeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('ASSIGN WORKSHOP BAY', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                  const Text(
+                    'SELECT BAY',
+                    style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8),
+                  ),
                   const SizedBox(height: 10),
                   // 4 Big Bay Selection Buttons
                   Row(
@@ -270,7 +242,10 @@ class _IntakeScreenState extends State<IntakeScreen> {
 
                   const SizedBox(height: 14),
 
-                  const Text('SERVICE PACKAGE', style: TextStyle(color: Colors.white60, fontSize: 11, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'SERVICE TYPE',
+                    style: TextStyle(color: Colors.white60, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
 
                   Wrap(
@@ -279,7 +254,14 @@ class _IntakeScreenState extends State<IntakeScreen> {
                     children: _servicePresets.map((service) {
                       final isSelected = _selectedService == service;
                       return ChoiceChip(
-                        label: Text(service, style: TextStyle(fontSize: 11, color: isSelected ? Colors.black87 : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                        label: Text(
+                          service,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isSelected ? Colors.black87 : Colors.white70,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
                         selected: isSelected,
                         selectedColor: Colors.amber,
                         backgroundColor: const Color(0xFF0F172A),
@@ -309,7 +291,10 @@ class _IntakeScreenState extends State<IntakeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('5-POINT WALKAROUND', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                      const Text(
+                        'VEHICLE INSPECTION CHECK',
+                        style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8),
+                      ),
                       TextButton(
                         onPressed: () {
                           setState(() {
@@ -321,7 +306,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
                           });
                         },
                         style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 20)),
-                        child: const Text('Reset All OK', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                        child: const Text('All OK', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
                       ),
                     ],
                   ),
@@ -330,11 +315,11 @@ class _IntakeScreenState extends State<IntakeScreen> {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      _buildCheckChip('Body Paint', _bodyOk, () => setState(() => _bodyOk = !_bodyOk)),
-                      _buildCheckChip('Tire Tread', _tiresOk, () => setState(() => _tiresOk = !_tiresOk)),
-                      _buildCheckChip('Engine Oil', _oilOk, () => setState(() => _oilOk = !_oilOk)),
-                      _buildCheckChip('Brake Pads', _brakesOk, () => setState(() => _brakesOk = !_brakesOk)),
-                      _buildCheckChip('12V Battery', _batteryOk, () => setState(() => _batteryOk = !_batteryOk)),
+                      _buildCheckChip('Paint OK', _bodyOk, () => setState(() => _bodyOk = !_bodyOk)),
+                      _buildCheckChip('Tires OK', _tiresOk, () => setState(() => _tiresOk = !_tiresOk)),
+                      _buildCheckChip('Oil Level OK', _oilOk, () => setState(() => _oilOk = !_oilOk)),
+                      _buildCheckChip('Brakes OK', _brakesOk, () => setState(() => _brakesOk = !_brakesOk)),
+                      _buildCheckChip('Battery OK', _batteryOk, () => setState(() => _batteryOk = !_batteryOk)),
                     ],
                   ),
                 ],
@@ -353,7 +338,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
                     ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
                     : const Icon(Icons.check_circle_rounded, color: Colors.black87),
                 label: Text(
-                  _isSubmitting ? 'Assigning Bay...' : 'Confirm Check-In to $_selectedBay',
+                  _isSubmitting ? 'Checking In...' : 'Check In to $_selectedBay',
                   style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 style: ElevatedButton.styleFrom(

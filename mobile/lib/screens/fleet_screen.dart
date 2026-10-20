@@ -49,7 +49,7 @@ class _FleetScreenState extends State<FleetScreen> {
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
         title: const Text(
-          'Customer Directory',
+          'Customers & Vehicles',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         actions: [
@@ -70,7 +70,7 @@ class _FleetScreenState extends State<FleetScreen> {
                     onChanged: (v) => setState(() => _query = v),
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                     decoration: InputDecoration(
-                      hintText: 'Search plate, customer, or phone...',
+                      hintText: 'Search by plate, customer, or phone...',
                       hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                       prefixIcon: const Icon(Icons.search_rounded, color: Colors.amber, size: 20),
                       filled: true,
@@ -183,7 +183,7 @@ class _FleetScreenState extends State<FleetScreen> {
                       final plate = c.vehicles.isNotEmpty ? c.vehicles.first.plateNumber : 'your car';
                       WhatsAppLauncher.openChat(
                         phone: c.phone,
-                        message: "Hi ${c.fullName}, contacting you from Apex AutoWorks regarding your $plate.",
+                        message: "Hello ${c.fullName}! Contacting you from Apex AutoWorks regarding your $plate.",
                       );
                     },
                     icon: const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: Colors.white),

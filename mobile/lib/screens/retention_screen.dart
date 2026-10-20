@@ -32,10 +32,8 @@ class _RetentionScreenState extends State<RetentionScreen> {
   }
 
   Future<void> _sendWhatsAppReminder(RetentionAlertModel alert) async {
-    // 1. Log in database
     await ApiService.sendRetentionReminder(alert);
 
-    // 2. Open real WhatsApp application on the device
     final launched = await WhatsAppLauncher.openChat(
       phone: alert.phone,
       message: alert.reminderDraft,
@@ -47,7 +45,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
           content: Text(
             launched
                 ? 'Opening WhatsApp for ${alert.customerName}...'
-                : 'Reminder recorded for ${alert.customerName} (${alert.phone})',
+                : 'Reminder sent to ${alert.customerName}',
           ),
           backgroundColor: const Color(0xFF10B981),
           duration: const Duration(seconds: 2),
@@ -67,11 +65,11 @@ class _RetentionScreenState extends State<RetentionScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'WhatsApp Reminders',
+              'Service Reminders',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             Text(
-              '${_alerts.length} overdue vehicle reminders ready',
+              '${_alerts.length} vehicles due for service',
               style: const TextStyle(fontSize: 12, color: Colors.amber, fontWeight: FontWeight.w600),
             ),
           ],
@@ -91,7 +89,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
               child: _alerts.isEmpty
                   ? const Center(
                       child: Text(
-                        'All customer vehicles are up to date!',
+                        'All customer vehicles are up to date.',
                         style: TextStyle(color: Colors.white60, fontSize: 14),
                       ),
                     )
@@ -120,7 +118,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Plate & Overdue Badge
+            // Top Row: Plate & Due Badge
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -153,12 +151,12 @@ class _RetentionScreenState extends State<RetentionScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent.withOpacity(0.18),
+                    color: Colors.amber.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${alert.daysOverdue}d overdue',
-                    style: const TextStyle(color: Colors.redAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -174,7 +172,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
 
             const SizedBox(height: 10),
 
-            // Short Message Preview
+            // Message Preview
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -199,7 +197,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
                 onPressed: () => _sendWhatsAppReminder(alert),
                 icon: const Icon(Icons.chat_rounded, color: Colors.white, size: 16),
                 label: const Text(
-                  'Open WhatsApp Chat',
+                  'Send WhatsApp Reminder',
                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 style: ElevatedButton.styleFrom(
