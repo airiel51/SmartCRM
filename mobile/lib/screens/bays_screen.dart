@@ -67,7 +67,7 @@ class _BaysScreenState extends State<BaysScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${s.vehiclePlate} updated to $nextStage'),
-            backgroundColor: nextStage == 'Ready for Pickup' ? const Color(0xFF10B981) : Colors.amber.shade700,
+            backgroundColor: nextStage == 'Ready for Pickup' ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -76,60 +76,55 @@ class _BaysScreenState extends State<BaysScreen> {
   }
 
   void _notifyCustomerReady(ServiceOrderModel s) {
-    final msg = "Hello ${s.customerName}! Your car (${s.vehiclePlate}) is ready for collection at Apex AutoWorks. Service: ${s.serviceType}. Thank you!";
+    final msg = "Hello ${s.customerName}! Your vehicle (${s.vehiclePlate}) is inspected and ready for pickup at Apex AutoWorks. Thank you!";
     WhatsAppLauncher.openChat(
       phone: "+60165542190",
       message: msg,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening WhatsApp for ${s.customerName}...'),
-        backgroundColor: const Color(0xFF10B981),
-      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final allBays = ['Bay 1', 'Bay 2', 'Bay 3', 'Bay 4'];
-    final activeOrders = _services.where((s) => s.stage != 'Invoiced').toList();
-    final occupiedCount = activeOrders.map((s) => s.serviceBay).toSet().length;
+    final activeOrders = _services.where((s) => s.stage != 'Invoiced' && s.stage != 'Completed').toList();
+    final occupiedCount = allBays.where((b) => activeOrders.any((s) => s.serviceBay.toLowerCase().contains(b.toLowerCase()))).length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: Colors.white,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Apex AutoWorks',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
             ),
             Text(
               '$occupiedCount of 4 bays in use',
-              style: const TextStyle(fontSize: 12, color: Colors.amber, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.bold),
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
+            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B)),
             onPressed: _loadServices,
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.amber))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFF59E0B)))
           : RefreshIndicator(
               onRefresh: _loadServices,
-              color: Colors.amber,
+              color: const Color(0xFFF59E0B),
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 children: allBays.map((bayName) {
                   final order = activeOrders.firstWhere(
-                    (s) => s.serviceBay.toLowerCase().trim() == bayName.toLowerCase().trim(),
+                    (s) => s.serviceBay.toLowerCase().contains(bayName.toLowerCase()),
                     orElse: () => ServiceOrderModel(
                       id: '-1',
                       customerName: '',
@@ -158,29 +153,29 @@ class _BaysScreenState extends State<BaysScreen> {
     String statusLabel;
 
     if (!isOccupied) {
-      badgeBg = Colors.green.withOpacity(0.15);
-      badgeText = const Color(0xFF34D399);
+      badgeBg = const Color(0xFFECFDF5);
+      badgeText = const Color(0xFF059669);
       statusLabel = 'Available';
     } else {
       switch (s.stage) {
         case 'In Progress':
-          badgeBg = Colors.amber.withOpacity(0.2);
-          badgeText = Colors.amber;
+          badgeBg = const Color(0xFFFEF3C7);
+          badgeText = const Color(0xFFD97706);
           statusLabel = 'In Service';
           break;
         case 'Quality Inspection':
-          badgeBg = Colors.blue.withOpacity(0.2);
-          badgeText = Colors.lightBlueAccent;
+          badgeBg = const Color(0xFFEFF6FF);
+          badgeText = const Color(0xFF2563EB);
           statusLabel = 'Final Check';
           break;
         case 'Ready for Pickup':
-          badgeBg = const Color(0xFF10B981).withOpacity(0.2);
-          badgeText = const Color(0xFF34D399);
+          badgeBg = const Color(0xFFECFDF5);
+          badgeText = const Color(0xFF059669);
           statusLabel = 'Ready';
           break;
         default:
-          badgeBg = Colors.purple.withOpacity(0.2);
-          badgeText = Colors.purpleAccent;
+          badgeBg = const Color(0xFFF3E8FF);
+          badgeText = const Color(0xFF7C3AED);
           statusLabel = 'Waiting';
       }
     }
@@ -188,12 +183,19 @@ class _BaysScreenState extends State<BaysScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isOccupied ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.05),
+          color: isOccupied ? const Color(0xFFCBD5E1) : const Color(0xFFE2E8F0),
           width: 1.2,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -207,30 +209,30 @@ class _BaysScreenState extends State<BaysScreen> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
-                        color: isOccupied ? Colors.amber.withOpacity(0.2) : Colors.white10,
-                        borderRadius: BorderRadius.circular(10),
+                        color: isOccupied ? const Color(0xFFFEF3C7) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.car_repair_rounded,
-                        color: isOccupied ? Colors.amber : Colors.white38,
-                        size: 20,
+                        color: isOccupied ? const Color(0xFFD97706) : const Color(0xFF94A3B8),
+                        size: 18,
                       ),
                     ),
                     const SizedBox(width: 10),
                     Text(
                       bayName,
                       style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
                       ),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: badgeBg,
                     borderRadius: BorderRadius.circular(20),
@@ -240,8 +242,8 @@ class _BaysScreenState extends State<BaysScreen> {
                     style: TextStyle(
                       color: badgeText,
                       fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
                     ),
                   ),
                 ),
@@ -262,18 +264,18 @@ class _BaysScreenState extends State<BaysScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.04),
+                    color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.add_circle_outline_rounded, color: Colors.amber, size: 18),
+                      const Icon(Icons.add_circle_outline_rounded, color: Color(0xFFD97706), size: 18),
                       const SizedBox(width: 8),
                       Text(
                         'Assign Car to $bayName',
-                        style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w600, fontSize: 13),
+                        style: const TextStyle(color: Color(0xFFD97706), fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ],
                   ),
@@ -285,19 +287,18 @@ class _BaysScreenState extends State<BaysScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.black,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white24),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       s.vehiclePlate,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 1.2,
+                        letterSpacing: 1,
                       ),
                     ),
                   ),
@@ -309,7 +310,7 @@ class _BaysScreenState extends State<BaysScreen> {
                         Text(
                           s.customerName,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: Color(0xFF0F172A),
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
@@ -319,8 +320,9 @@ class _BaysScreenState extends State<BaysScreen> {
                         Text(
                           s.serviceType,
                           style: const TextStyle(
-                            color: Colors.white70,
+                            color: Color(0xFF64748B),
                             fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -355,11 +357,11 @@ class _BaysScreenState extends State<BaysScreen> {
                       child: OutlinedButton(
                         onPressed: () => _advanceStage(s),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.white24),
+                          side: const BorderSide(color: Color(0xFFCBD5E1)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: const Text('Clear Bay', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        child: const Text('Clear Bay', style: TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -370,7 +372,7 @@ class _BaysScreenState extends State<BaysScreen> {
                   child: ElevatedButton(
                     onPressed: () => _advanceStage(s),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: s.stage == 'In Progress' ? Colors.blueAccent : Colors.amber,
+                      backgroundColor: s.stage == 'In Progress' ? const Color(0xFF2563EB) : const Color(0xFFF59E0B),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
@@ -381,8 +383,8 @@ class _BaysScreenState extends State<BaysScreen> {
                               ? 'Move to Final Check ➔'
                               : 'Mark Ready for Pickup ➔',
                       style: TextStyle(
-                        color: s.stage == 'In Progress' ? Colors.white : Colors.black87,
-                        fontWeight: FontWeight.bold,
+                        color: s.stage == 'In Progress' ? Colors.white : const Color(0xFF0F172A),
+                        fontWeight: FontWeight.w900,
                         fontSize: 13,
                       ),
                     ),

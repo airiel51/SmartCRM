@@ -8,7 +8,6 @@ import AgenticAISuite from './components/AgenticAISuite';
 import SupabaseSyncView from './components/SupabaseSyncView';
 import RightInspectorPanel from './components/RightInspectorPanel';
 import AICopilotDrawer from './components/AICopilotDrawer';
-import MobilePICSimulator from './components/MobilePICSimulator';
 import { AddCustomerModal, AddServiceModal } from './components/Modals';
 
 const VIEW_TITLES = {
@@ -17,12 +16,11 @@ const VIEW_TITLES = {
   pipeline: 'Service Bays & Pipeline',
   customers: 'Fleet Directory',
   supabase: 'Supabase Cloud Sync',
-  agentic_ai: 'Agentic AI Suite',
-  mobile_pic: 'Floor PIC Mobile'
+  agentic_ai: 'Agentic AI Suite'
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('mobile_pic');
+  const [currentView, setCurrentView] = useState('dashboard');
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(true);
   const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(false);
@@ -101,23 +99,6 @@ export default function App() {
                 </button>
               )}
 
-              {/* Mobile PIC Shop-Floor Mode Switcher */}
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={() => setCurrentView(currentView === 'mobile_pic' ? 'dashboard' : 'mobile_pic')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  fontWeight: 700,
-                  background: currentView === 'mobile_pic' ? '#f59e0b' : undefined,
-                  color: currentView === 'mobile_pic' ? '#0f172a' : undefined
-                }}
-                title="Toggle Shop-Floor PIC Mobile View"
-              >
-                <span>📱 Floor PIC Mobile</span>
-              </button>
-
               <button
                 className="btn btn-secondary btn-sm"
                 onClick={() => setIsCopilotOpen(true)}
@@ -172,11 +153,6 @@ export default function App() {
           )}
           {currentView === 'supabase' && (
             <SupabaseSyncView />
-          )}
-          {currentView === 'mobile_pic' && (
-            <MobilePICSimulator
-              onSelectCustomer={setSelectedCustomer}
-            />
           )}
         </div>
 

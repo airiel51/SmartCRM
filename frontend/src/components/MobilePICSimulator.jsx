@@ -308,7 +308,7 @@ export default function MobilePICSimulator({ onSelectCustomer }) {
             {activeTab === 'bays' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {allBays.map(bayName => {
-                  const s = activeOrders.find(o => (o.service_bay || '').toLowerCase().trim() === bayName.toLowerCase().trim());
+                  const s = activeOrders.find(o => (o.service_bay || '').toLowerCase().includes(bayName.toLowerCase()));
                   const isOccupied = !!s;
 
                   let badgeBg = 'rgba(16, 185, 129, 0.15)';

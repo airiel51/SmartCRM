@@ -49,4 +49,7 @@ class WhatsAppLauncher {
       return false;
     }
   }
+
+  /// Alias for makePhoneCall
+  static Future<bool> callCustomer(String phone) => makePhoneCall(phone);
 }

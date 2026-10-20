@@ -57,40 +57,41 @@ class _RetentionScreenState extends State<RetentionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: Colors.white,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Service Reminders',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
             ),
             Text(
               '${_alerts.length} vehicles due for service',
-              style: const TextStyle(fontSize: 12, color: Colors.amber, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.bold),
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
+            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B)),
             onPressed: _loadAlerts,
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.amber))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFF59E0B)))
           : RefreshIndicator(
               onRefresh: _loadAlerts,
-              color: Colors.amber,
+              color: const Color(0xFFF59E0B),
               child: _alerts.isEmpty
                   ? const Center(
                       child: Text(
                         'All customer vehicles are up to date.',
-                        style: TextStyle(color: Colors.white60, fontSize: 14),
+                        style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
                       ),
                     )
                   : ListView.builder(
@@ -109,9 +110,16 @@ class _RetentionScreenState extends State<RetentionScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -129,7 +137,6 @@ class _RetentionScreenState extends State<RetentionScreen> {
                       decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.white24),
                       ),
                       child: Text(
                         alert.plateNumber,
@@ -144,19 +151,19 @@ class _RetentionScreenState extends State<RetentionScreen> {
                     const SizedBox(width: 8),
                     Text(
                       alert.vehicleName,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                      style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                   ],
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.18),
+                    color: const Color(0xFFFEE2E2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${alert.daysOverdue}d overdue',
-                    style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Color(0xFFDC2626), fontSize: 11, fontWeight: FontWeight.w800),
                   ),
                 ),
               ],
@@ -167,7 +174,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
             // Customer Name & Phone
             Text(
               '${alert.customerName} • ${alert.phone}',
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
+              style: const TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w500),
             ),
 
             const SizedBox(height: 10),
@@ -176,12 +183,13 @@ class _RetentionScreenState extends State<RetentionScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF0F172A),
+                color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Text(
                 alert.reminderDraft,
-                style: const TextStyle(color: Colors.white70, fontSize: 11, height: 1.3),
+                style: const TextStyle(color: Color(0xFF334155), fontSize: 11.5, height: 1.3),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -202,6 +210,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF10B981),
+                  elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
