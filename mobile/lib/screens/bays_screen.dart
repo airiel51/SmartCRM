@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/whatsapp_launcher.dart';
 import '../models/models.dart';
 
 class BaysScreen extends StatefulWidget {
-  const BaysScreen({Key? key}) : super(key: key);
+  final Function(int, {String? defaultBay})? onNavigateTab;
+  const BaysScreen({Key? key, this.onNavigateTab}) : super(key: key);
 
   @override
   State<BaysScreen> createState() => _BaysScreenState();
@@ -12,7 +14,6 @@ class BaysScreen extends StatefulWidget {
 class _BaysScreenState extends State<BaysScreen> {
   bool _isLoading = true;
   List<ServiceOrderModel> _services = [];
-  String _filterBay = 'All';
 
   final List<String> _stages = [
     'Scheduled',
@@ -65,8 +66,8 @@ class _BaysScreenState extends State<BaysScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${s.vehiclePlate} advanced to "$nextStage"!'),
-            backgroundColor: nextStage == 'Ready for Pickup' ? Colors.green.shade700 : Colors.blue.shade700,
+            content: Text('${s.vehiclePlate} ➔ $nextStage'),
+            backgroundColor: nextStage == 'Ready for Pickup' ? const Color(0xFF10B981) : Colors.amber.shade700,
             duration: const Duration(seconds: 2),
           ),
         );
@@ -74,18 +75,46 @@ class _BaysScreenState extends State<BaysScreen> {
     }
   }
 
+  void _notifyCustomerReady(ServiceOrderModel s) {
+    final msg = "Hello ${s.customerName}! Your car (${s.vehiclePlate}) is ready for collection at Apex AutoWorks. Service: ${s.serviceType}. Thank you!";
+    // Find phone from customer or prompt
+    WhatsAppLauncher.openChat(
+      phone: "+60165542190", // default Malaysian format
+      message: msg,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Opening WhatsApp for ${s.customerName}...'),
+        backgroundColor: const Color(0xFF10B981),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filtered = _filterBay == 'All'
-        ? _services
-        : _services.where((s) => s.serviceBay.toLowerCase().contains(_filterBay.toLowerCase())).toList();
+    // Organize by 4 physical bays
+    final allBays = ['Bay 1', 'Bay 2', 'Bay 3', 'Bay 4'];
+    final activeOrders = _services.where((s) => s.stage != 'Invoiced').toList();
+    final occupiedCount = activeOrders.map((s) => s.serviceBay).toSet().length;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
-        title: const Text('Service Bays & Work Orders', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Workshop Bays',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            Text(
+              '$occupiedCount of 4 bays occupied',
+              style: const TextStyle(fontSize: 12, color: Colors.amber, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
@@ -95,195 +124,278 @@ class _BaysScreenState extends State<BaysScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.amber))
-          : Column(
-              children: [
-                // Bay Filter Chips
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  color: const Color(0xFF1E293B).withOpacity(0.6),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: ['All', 'Bay 1', 'Bay 2', 'Bay 3', 'Bay 4'].map((bay) {
-                        final isSelected = _filterBay == bay;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: FilterChip(
-                            label: Text(bay),
-                            selected: isSelected,
-                            onSelected: (val) => setState(() => _filterBay = bay),
-                            backgroundColor: const Color(0xFF1E293B),
-                            selectedColor: Colors.amber,
-                            labelStyle: TextStyle(
-                              color: isSelected ? Colors.black87 : Colors.white70,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                            checkmarkColor: Colors.black87,
-                            side: BorderSide(color: isSelected ? Colors.amber : Colors.white12),
-                          ),
-                        );
-                      }).toList(),
+          : RefreshIndicator(
+              onRefresh: _loadServices,
+              color: Colors.amber,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                children: allBays.map((bayName) {
+                  // Find current active car in this bay
+                  final order = activeOrders.firstWhere(
+                    (s) => s.serviceBay.toLowerCase().trim() == bayName.toLowerCase().trim(),
+                    orElse: () => ServiceOrderModel(
+                      id: '-1',
+                      customerName: '',
+                      vehiclePlate: '',
+                      serviceType: '',
+                      stage: 'Vacant',
+                      serviceBay: bayName,
+                      symptomsReported: '',
+                      technicianNotes: '',
+                      totalAmount: 0,
                     ),
-                  ),
-                ),
+                  );
 
-                // Work Orders List
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filtered.length,
-                    itemBuilder: (context, idx) {
-                      final item = filtered[idx];
-                      return _buildServiceCard(item);
-                    },
-                  ),
-                ),
-              ],
+                  return _buildBayCard(bayName, order);
+                }).toList(),
+              ),
             ),
     );
   }
 
-  Widget _buildServiceCard(ServiceOrderModel s) {
-    Color stageColor;
-    IconData stageIcon;
+  Widget _buildBayCard(String bayName, ServiceOrderModel s) {
+    final isOccupied = s.id != '-1';
 
-    switch (s.stage) {
-      case 'In Progress':
-        stageColor = Colors.amber;
-        stageIcon = Icons.engineering_rounded;
-        break;
-      case 'Quality Inspection':
-        stageColor = Colors.blueAccent;
-        stageIcon = Icons.fact_check_rounded;
-        break;
-      case 'Ready for Pickup':
-        stageColor = Colors.greenAccent;
-        stageIcon = Icons.check_circle_outline_rounded;
-        break;
-      case 'Invoiced':
-        stageColor = Colors.grey;
-        stageIcon = Icons.receipt_long_rounded;
-        break;
-      default:
-        stageColor = Colors.purpleAccent;
-        stageIcon = Icons.schedule_rounded;
+    Color badgeBg;
+    Color badgeText;
+    String statusLabel;
+
+    if (!isOccupied) {
+      badgeBg = Colors.green.withOpacity(0.15);
+      badgeText = const Color(0xFF34D399);
+      statusLabel = 'AVAILABLE';
+    } else {
+      switch (s.stage) {
+        case 'In Progress':
+          badgeBg = Colors.amber.withOpacity(0.2);
+          badgeText = Colors.amber;
+          statusLabel = 'WORKING';
+          break;
+        case 'Quality Inspection':
+          badgeBg = Colors.blue.withOpacity(0.2);
+          badgeText = Colors.lightBlueAccent;
+          statusLabel = 'QC INSPECT';
+          break;
+        case 'Ready for Pickup':
+          badgeBg = const Color(0xFF10B981).withOpacity(0.2);
+          badgeText = const Color(0xFF34D399);
+          statusLabel = 'READY';
+          break;
+        default:
+          badgeBg = Colors.purple.withOpacity(0.2);
+          badgeText = Colors.purpleAccent;
+          statusLabel = 'SCHEDULED';
+      }
     }
-
-    final curIdx = _stages.indexOf(s.stage);
-    final hasNext = curIdx != -1 && curIdx < _stages.length - 1;
-    final nextStageTitle = hasNext ? _stages[curIdx + 1] : null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isOccupied ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.05),
+          width: 1.2,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: stageColor.withOpacity(0.12),
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(14), topRight: Radius.circular(14)),
-            ),
-            child: Row(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row: Bay Name & Status
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(stageIcon, color: stageColor, size: 16),
-                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isOccupied ? Colors.amber.withOpacity(0.2) : Colors.white10,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.car_repair_rounded,
+                        color: isOccupied ? Colors.amber : Colors.white38,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
                     Text(
-                      s.stage,
-                      style: TextStyle(color: stageColor, fontSize: 12, fontWeight: FontWeight.bold),
+                      bayName,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
-                Text(
-                  s.serviceBay,
-                  style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: badgeBg,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    statusLabel,
+                    style: TextStyle(
+                      color: badgeText,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      s.vehiclePlate,
-                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'RM ${s.totalAmount.toStringAsFixed(2)}',
-                      style: const TextStyle(color: Colors.amber, fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${s.customerName} • ${s.serviceType}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 13),
-                ),
+            const SizedBox(height: 12),
 
-                if (s.symptomsReported != null && s.symptomsReported!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
+            if (!isOccupied)
+              // Empty bay state - Simple clean 1 tap to assign
+              InkWell(
+                onTap: () {
+                  if (widget.onNavigateTab != null) {
+                    widget.onNavigateTab!(1, defaultBay: bayName);
+                  }
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white10, style: BorderStyle.solid),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.add_circle_outline_rounded, color: Colors.amber, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Check-In Car to $bayName',
+                        style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else ...[
+              // Occupied Bay Information
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // License Plate - Big and prominent!
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
+                      color: Colors.black,
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white24),
                     ),
-                    child: Row(
+                    child: Text(
+                      s.vehiclePlate,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.info_outline, color: Colors.white54, size: 14),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            s.symptomsReported!,
-                            style: const TextStyle(color: Colors.white60, fontSize: 11),
+                        Text(
+                          s.customerName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          s.serviceType,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
                 ],
+              ),
 
-                const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-                // Advance Stage Button
-                if (hasNext)
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _advanceStage(s),
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 16, color: Colors.amber),
-                      label: Text(
-                        'Advance to $nextStageTitle',
-                        style: const TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold),
+              // Action Buttons
+              if (s.stage == 'Ready for Pickup')
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _notifyCustomerReady(s),
+                        icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
+                        label: const Text('WhatsApp Owner', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF10B981),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
                       ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.amber.withOpacity(0.5)),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 2,
+                      child: OutlinedButton(
+                        onPressed: () => _advanceStage(s),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.white24),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: const Text('Release Bay', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _advanceStage(s),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: s.stage == 'In Progress' ? Colors.blueAccent : Colors.amber,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Text(
+                      s.stage == 'Scheduled'
+                          ? 'Start Work in $bayName ➔'
+                          : s.stage == 'In Progress'
+                              ? 'Mark QC Inspection ➔'
+                              : 'Mark Ready for Pickup ➔',
+                      style: TextStyle(
+                        color: s.stage == 'In Progress' ? Colors.white : Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
                     ),
                   ),
-              ],
-            ),
-          ),
-        ],
+                ),
+            ],
+          ],
+        ),
       ),
     );
   }

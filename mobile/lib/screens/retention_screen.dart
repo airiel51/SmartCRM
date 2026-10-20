@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/whatsapp_launcher.dart';
 import '../models/models.dart';
 
 class RetentionScreen extends StatefulWidget {
@@ -30,13 +31,26 @@ class _RetentionScreenState extends State<RetentionScreen> {
     }
   }
 
-  Future<void> _sendReminder(RetentionAlertModel alert) async {
-    final ok = await ApiService.sendRetentionReminder(alert);
+  Future<void> _sendWhatsAppReminder(RetentionAlertModel alert) async {
+    // 1. Log in database
+    await ApiService.sendRetentionReminder(alert);
+
+    // 2. Open real WhatsApp application on the device
+    final launched = await WhatsAppLauncher.openChat(
+      phone: alert.phone,
+      message: alert.reminderDraft,
+    );
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ WhatsApp reminder dispatched to ${alert.customerName} (${alert.phone})!'),
-          backgroundColor: Colors.green.shade700,
+          content: Text(
+            launched
+                ? 'Opening WhatsApp for ${alert.customerName}...'
+                : 'Reminder recorded for ${alert.customerName} (${alert.phone})',
+          ),
+          backgroundColor: const Color(0xFF10B981),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -49,7 +63,19 @@ class _RetentionScreenState extends State<RetentionScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
-        title: const Text('Autonomous Retention Engine', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'WhatsApp Reminders',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            Text(
+              '${_alerts.length} overdue vehicle reminders ready',
+              style: const TextStyle(fontSize: 12, color: Colors.amber, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
@@ -59,94 +85,62 @@ class _RetentionScreenState extends State<RetentionScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.amber))
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                // Info Banner
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.purpleAccent.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.auto_awesome_rounded, color: Colors.purpleAccent, size: 24),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Agentic Scanner monitors vehicle mileage vs 5k/10k/20k/40k thresholds. Dispatches proactive WhatsApp reminders before churn occurs.',
-                          style: TextStyle(color: Colors.white, fontSize: 12, height: 1.3),
-                        ),
+          : RefreshIndicator(
+              onRefresh: _loadAlerts,
+              color: Colors.amber,
+              child: _alerts.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'All customer vehicles are up to date!',
+                        style: TextStyle(color: Colors.white60, fontSize: 14),
                       ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'OVERDUE FLEET INTERVENTIONS',
-                      style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      itemCount: _alerts.length,
+                      itemBuilder: (context, idx) {
+                        final item = _alerts[idx];
+                        return _buildReminderCard(item);
+                      },
                     ),
-                    Text(
-                      '${_alerts.length} Actionable',
-                      style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                if (_alerts.isEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Center(
-                      child: Text('All customer vehicles are within valid service intervals.', style: TextStyle(color: Colors.white60)),
-                    ),
-                  )
-                else
-                  ..._alerts.map((a) => _buildAlertCard(a)).toList(),
-              ],
             ),
     );
   }
 
-  Widget _buildAlertCard(RetentionAlertModel alert) {
+  Widget _buildReminderCard(RetentionAlertModel alert) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Top Row: Plate & Overdue Badge
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.2),
+                        color: Colors.black,
                         borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.white24),
                       ),
                       child: Text(
                         alert.plateNumber,
-                        style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                          letterSpacing: 1,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -157,10 +151,10 @@ class _RetentionScreenState extends State<RetentionScreen> {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(6),
+                    color: Colors.redAccent.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${alert.daysOverdue}d overdue',
@@ -169,60 +163,49 @@ class _RetentionScreenState extends State<RetentionScreen> {
                 ),
               ],
             ),
+
             const SizedBox(height: 8),
+
+            // Customer Name & Phone
             Text(
-              'Owner: ${alert.customerName} • ${alert.phone}',
+              '${alert.customerName} • ${alert.phone}',
               style: const TextStyle(color: Colors.white70, fontSize: 12),
             ),
-            const SizedBox(height: 2),
-            Text(
-              'Current Odometer: ${alert.currentMileage} km (+${alert.kmOverdue} km past interval)',
-              style: const TextStyle(color: Colors.white54, fontSize: 11),
+
+            const SizedBox(height: 10),
+
+            // Short Message Preview
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F172A),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                alert.reminderDraft,
+                style: const TextStyle(color: Colors.white70, fontSize: 11, height: 1.3),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
 
             const SizedBox(height: 12),
 
-            // AI WhatsApp Draft
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F172A),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: const [
-                      Icon(Icons.chat_bubble_outline_rounded, color: Colors.greenAccent, size: 14),
-                      SizedBox(width: 6),
-                      Text(
-                        'AI Generated WhatsApp Reminder Draft',
-                        style: TextStyle(color: Colors.greenAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    alert.reminderDraft,
-                    style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.3),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            // Send Button
-            ElevatedButton.icon(
-              onPressed: () => _sendReminder(alert),
-              icon: const Icon(Icons.send_rounded, size: 16, color: Colors.black87),
-              label: const Text('Send WhatsApp Retention Notice', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 12)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.greenAccent,
-                minimumSize: const Size(double.infinity, 42),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            // Big Direct WhatsApp Button
+            SizedBox(
+              width: double.infinity,
+              height: 42,
+              child: ElevatedButton.icon(
+                onPressed: () => _sendWhatsAppReminder(alert),
+                icon: const Icon(Icons.chat_rounded, color: Colors.white, size: 16),
+                label: const Text(
+                  'Open WhatsApp Chat',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10B981),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
               ),
             ),
           ],

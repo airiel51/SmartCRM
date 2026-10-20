@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/whatsapp_launcher.dart';
 import '../models/models.dart';
 
 class FleetScreen extends StatefulWidget {
@@ -12,7 +13,7 @@ class FleetScreen extends StatefulWidget {
 class _FleetScreenState extends State<FleetScreen> {
   bool _isLoading = true;
   List<CustomerModel> _customers = [];
-  String _search = '';
+  String _query = '';
 
   @override
   void initState() {
@@ -34,9 +35,10 @@ class _FleetScreenState extends State<FleetScreen> {
   @override
   Widget build(BuildContext context) {
     final filtered = _customers.where((c) {
-      final q = _search.toLowerCase();
+      final q = _query.toLowerCase().trim();
+      if (q.isEmpty) return true;
       final matchName = c.fullName.toLowerCase().contains(q);
-      final matchPhone = c.phone.contains(q);
+      final matchPhone = c.phone.toLowerCase().contains(q);
       final matchPlate = c.vehicles.any((v) => v.plateNumber.toLowerCase().contains(q));
       return matchName || matchPhone || matchPlate;
     }).toList();
@@ -46,7 +48,10 @@ class _FleetScreenState extends State<FleetScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
-        title: const Text('Customer & Vehicle Fleet', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text(
+          'Customer Directory',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
@@ -58,54 +63,41 @@ class _FleetScreenState extends State<FleetScreen> {
           ? const Center(child: CircularProgressIndicator(color: Colors.amber))
           : Column(
               children: [
-                // Search bar
+                // Search Bar
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: TextField(
-                    onChanged: (val) => setState(() => _search = val),
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    onChanged: (v) => setState(() => _query = v),
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
                     decoration: InputDecoration(
-                      hintText: 'Search customer, phone, or plate...',
+                      hintText: 'Search plate, customer, or phone...',
                       hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                       prefixIcon: const Icon(Icons.search_rounded, color: Colors.amber, size: 20),
                       filled: true,
                       fillColor: const Color(0xFF1E293B),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.white12)),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.white12)),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.amber)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     ),
                   ),
                 ),
 
-                // Customer Count Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'REGISTERED CLIENTS (${filtered.length})',
-                        style: const TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8),
-                      ),
-                      const Text(
-                        'Multi-Vehicle Linking Active',
-                        style: TextStyle(color: Colors.tealAccent, fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Customer Cards List
+                // Customer list
                 Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filtered.length,
-                    itemBuilder: (context, idx) {
-                      final c = filtered[idx];
-                      return _buildCustomerCard(c);
-                    },
+                  child: RefreshIndicator(
+                    onRefresh: _loadCustomers,
+                    color: Colors.amber,
+                    child: filtered.isEmpty
+                        ? const Center(
+                            child: Text('No customers found.', style: TextStyle(color: Colors.white54)),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            itemCount: filtered.length,
+                            itemBuilder: (context, idx) {
+                              final c = filtered[idx];
+                              return _buildCustomerCard(c);
+                            },
+                          ),
                   ),
                 ),
               ],
@@ -114,17 +106,8 @@ class _FleetScreenState extends State<FleetScreen> {
   }
 
   Widget _buildCustomerCard(CustomerModel c) {
-    Color riskColor;
-    if (c.churnRisk == 'High') {
-      riskColor = Colors.redAccent;
-    } else if (c.churnRisk == 'Medium') {
-      riskColor = Colors.amber;
-    } else {
-      riskColor = Colors.greenAccent;
-    }
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(14),
@@ -135,155 +118,87 @@ class _FleetScreenState extends State<FleetScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Name + Churn Risk Pill
+            // Top row: Name & Phone
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.amber.shade700,
-                      child: Text(
-                        c.fullName.isNotEmpty ? c.fullName[0].toUpperCase() : 'C',
-                        style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          c.fullName,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        Text(
-                          c.phone,
-                          style: const TextStyle(color: Colors.white54, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: riskColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: riskColor.withOpacity(0.4)),
-                  ),
+                Expanded(
                   child: Text(
-                    '${c.churnRisk} Churn Risk',
-                    style: TextStyle(color: riskColor, fontSize: 10, fontWeight: FontWeight.bold),
+                    c.fullName,
+                    style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ),
+                Text(
+                  c.phone,
+                  style: const TextStyle(color: Colors.white60, fontSize: 12),
                 ),
               ],
             ),
 
+            const SizedBox(height: 8),
+
+            // Vehicles Tags
+            if (c.vehicles.isNotEmpty)
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: c.vehicles.map((v) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0F172A),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: Text(
+                      '${v.plateNumber} (${v.make} ${v.model})',
+                      style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  );
+                }).toList(),
+              ),
+
             const SizedBox(height: 12),
 
-            // Metrics row: Health Score, Spend, Visits
+            // Action Buttons: Call & WhatsApp
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStatPill('Health', '${c.healthScore}/100', Colors.tealAccent),
-                _buildStatPill('Total Spent', 'RM ${c.totalSpent.toStringAsFixed(0)}', Colors.amber),
-                _buildStatPill('Visits', '${c.visitCount}', Colors.blueAccent),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => WhatsAppLauncher.makePhoneCall(c.phone),
+                    icon: const Icon(Icons.call_rounded, size: 14, color: Colors.white70),
+                    label: const Text('Call', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.white24),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      final plate = c.vehicles.isNotEmpty ? c.vehicles.first.plateNumber : 'your car';
+                      WhatsAppLauncher.openChat(
+                        phone: c.phone,
+                        message: "Hi ${c.fullName}, contacting you from Apex AutoWorks regarding your $plate.",
+                      );
+                    },
+                    icon: const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: Colors.white),
+                    label: const Text('WhatsApp', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF10B981),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
               ],
             ),
-
-            const SizedBox(height: 12),
-
-            // Linked Vehicles Section
-            const Text(
-              'Linked Vehicles:',
-              style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 6),
-
-            if (c.vehicles.isEmpty)
-              const Text('No vehicles registered yet.', style: TextStyle(color: Colors.white38, fontSize: 11))
-            else
-              ...c.vehicles.map((v) => _buildVehicleBadge(v)).toList(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatPill(String label, String value, Color col) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Text(label, style: const TextStyle(color: Colors.white38, fontSize: 9)),
-          const SizedBox(height: 2),
-          Text(value, style: TextStyle(color: col, fontSize: 11, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVehicleBadge(VehicleModel v) {
-    Color statusColor;
-    if (v.maintenanceStatus == 'Overdue') {
-      statusColor = Colors.redAccent;
-    } else if (v.maintenanceStatus == 'Due Soon') {
-      statusColor = Colors.amber;
-    } else {
-      statusColor = Colors.greenAccent;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.white10,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  v.plateNumber,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${v.make} ${v.model}',
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                '${v.currentMileage} km',
-                style: const TextStyle(color: Colors.white38, fontSize: 11),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

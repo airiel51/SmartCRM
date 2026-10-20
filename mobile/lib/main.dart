@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/intake_screen.dart';
 import 'screens/bays_screen.dart';
+import 'screens/intake_screen.dart';
 import 'screens/retention_screen.dart';
 import 'screens/fleet_screen.dart';
 
@@ -43,17 +42,23 @@ class MainFloorNavigation extends StatefulWidget {
 
 class _MainFloorNavigationState extends State<MainFloorNavigation> {
   int _currentIndex = 0;
+  String? _preselectedBay;
 
-  void _navigateTab(int index) {
-    setState(() => _currentIndex = index);
+  void _navigateTab(int index, {String? defaultBay}) {
+    setState(() {
+      _currentIndex = index;
+      _preselectedBay = defaultBay;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      DashboardScreen(onNavigateTab: _navigateTab),
-      IntakeScreen(onIntakeCreated: () => _navigateTab(2)), // Move to Bays after intake
-      const BaysScreen(),
+      BaysScreen(onNavigateTab: _navigateTab),
+      IntakeScreen(
+        initialBay: _preselectedBay,
+        onIntakeCreated: () => _navigateTab(0), // return to Bays screen after check-in
+      ),
       const RetentionScreen(),
       const FleetScreen(),
     ];
@@ -85,29 +90,24 @@ class _MainFloorNavigationState extends State<MainFloorNavigation> {
           onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
           destinations: const [
             NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard_rounded),
-              label: 'Overview',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.add_task_outlined),
-              selectedIcon: Icon(Icons.add_task_rounded),
-              label: 'Intake',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.view_kanban_outlined),
-              selectedIcon: Icon(Icons.view_kanban_rounded),
+              icon: Icon(Icons.car_repair_outlined),
+              selectedIcon: Icon(Icons.car_repair_rounded),
               label: 'Bays',
             ),
             NavigationDestination(
-              icon: Icon(Icons.notifications_active_outlined),
-              selectedIcon: Icon(Icons.notifications_active_rounded),
-              label: 'Retention',
+              icon: Icon(Icons.add_circle_outline_rounded),
+              selectedIcon: Icon(Icons.add_circle_rounded),
+              label: 'Check-In',
             ),
             NavigationDestination(
-              icon: Icon(Icons.directions_car_outlined),
-              selectedIcon: Icon(Icons.directions_car_rounded),
-              label: 'Fleet',
+              icon: Icon(Icons.chat_bubble_outline_rounded),
+              selectedIcon: Icon(Icons.chat_bubble_rounded),
+              label: 'WhatsApp',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.search_rounded),
+              selectedIcon: Icon(Icons.person_search_rounded),
+              label: 'Directory',
             ),
           ],
         ),

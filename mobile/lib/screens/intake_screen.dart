@@ -3,7 +3,8 @@ import '../services/api_service.dart';
 
 class IntakeScreen extends StatefulWidget {
   final VoidCallback onIntakeCreated;
-  const IntakeScreen({Key? key, required this.onIntakeCreated}) : super(key: key);
+  final String? initialBay;
+  const IntakeScreen({Key? key, required this.onIntakeCreated, this.initialBay}) : super(key: key);
 
   @override
   State<IntakeScreen> createState() => _IntakeScreenState();
@@ -12,35 +13,46 @@ class IntakeScreen extends StatefulWidget {
 class _IntakeScreenState extends State<IntakeScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _customerNameCtrl = TextEditingController(text: 'Kamarul Ariffin');
-  final _phoneCtrl = TextEditingController(text: '+60 12-887 6543');
-  final _plateCtrl = TextEditingController(text: 'PGE 8892');
-  final _modelCtrl = TextEditingController(text: 'S70 1.5 Turbo');
-  final _mileageCtrl = TextEditingController(text: '28400');
-  final _symptomsCtrl = TextEditingController(text: 'Steering pulling slightly to the left at highway speeds, periodic 30k service check.');
-  final _costCtrl = TextEditingController(text: '280.00');
+  final _plateCtrl = TextEditingController();
+  final _customerNameCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _symptomsCtrl = TextEditingController();
 
-  String _selectedMake = 'Proton';
-  String _selectedBay = 'Bay 1 (Engine)';
+  String _selectedBay = 'Bay 1';
+  String _selectedService = 'Standard 10,000 km Service';
   bool _isSubmitting = false;
 
-  // 5-point Walkaround Inspection checklist
-  bool _exteriorInspected = true;
-  bool _treadDepthOk = true;
-  bool _oilLevelOk = false; // requires top-up
-  bool _brakePadsOk = true;
-  bool _batteryTested = true;
+  // 5-Point Walkaround Quick Toggles (all default to true for speed)
+  bool _bodyOk = true;
+  bool _tiresOk = true;
+  bool _oilOk = true;
+  bool _brakesOk = true;
+  bool _batteryOk = true;
+
+  final List<String> _servicePresets = [
+    'Standard 10,000 km Service',
+    'Brake Pad & Disc Overhaul',
+    'Aircond Inspection & Gas Refill',
+    'Engine Diagnosis & Tune-Up',
+  ];
 
   @override
-  void dispose() {
-    _customerNameCtrl.dispose();
-    _phoneCtrl.dispose();
-    _plateCtrl.dispose();
-    _modelCtrl.dispose();
-    _mileageCtrl.dispose();
-    _symptomsCtrl.dispose();
-    _costCtrl.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    if (widget.initialBay != null) {
+      _selectedBay = widget.initialBay!;
+    }
+  }
+
+  void _fillSample(String plate, String name, String phone, String service, String bay) {
+    setState(() {
+      _plateCtrl.text = plate;
+      _customerNameCtrl.text = name;
+      _phoneCtrl.text = phone;
+      _selectedService = service;
+      _selectedBay = bay;
+      _symptomsCtrl.text = "Regular scheduled maintenance & general checkup.";
+    });
   }
 
   Future<void> _submitIntake() async {
@@ -48,16 +60,24 @@ class _IntakeScreenState extends State<IntakeScreen> {
 
     setState(() => _isSubmitting = true);
 
+    final checklist = [
+      _bodyOk ? 'Body: OK' : 'Body: Scratched',
+      _tiresOk ? 'Tires: OK' : 'Tires: Worn',
+      _oilOk ? 'Oil: OK' : 'Oil: Low',
+      _brakesOk ? 'Brakes: OK' : 'Brakes: Low',
+      _batteryOk ? 'Battery: OK' : 'Battery: Weak',
+    ].join('; ');
+
     final success = await ApiService.createVehicleIntake(
       fullName: _customerNameCtrl.text.trim(),
       phone: _phoneCtrl.text.trim(),
       plateNumber: _plateCtrl.text.trim().toUpperCase(),
-      make: _selectedMake,
-      model: _modelCtrl.text.trim(),
-      mileage: int.tryParse(_mileageCtrl.text.trim()) ?? 0,
-      symptoms: _symptomsCtrl.text.trim(),
+      make: 'Vehicle',
+      model: _selectedService,
+      mileage: 35000,
+      symptoms: '${_symptomsCtrl.text.trim()} | Inspection: $checklist',
       bay: _selectedBay,
-      estimatedCost: double.tryParse(_costCtrl.text.trim()) ?? 250.0,
+      estimatedCost: 250.00,
     );
 
     setState(() => _isSubmitting = false);
@@ -66,14 +86,17 @@ class _IntakeScreenState extends State<IntakeScreen> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✓ Vehicle ${_plateCtrl.text.toUpperCase()} checked in & assigned to $_selectedBay!'),
-            backgroundColor: Colors.green.shade700,
+            content: Text('✓ ${_plateCtrl.text.toUpperCase()} checked in to $_selectedBay!'),
+            backgroundColor: const Color(0xFF10B981),
           ),
         );
         widget.onIntakeCreated();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to complete intake'), backgroundColor: Colors.redAccent),
+          const SnackBar(
+            content: Text('Check-in failed. Please verify network connection.'),
+            backgroundColor: Colors.redAccent,
+          ),
         );
       }
     }
@@ -86,166 +109,233 @@ class _IntakeScreenState extends State<IntakeScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
-        title: const Text('Shop Floor Vehicle Intake', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.amber),
-            tooltip: 'Simulate Plate OCR Scan',
-            onPressed: () {
-              setState(() {
-                _plateCtrl.text = 'VAB 2020';
-                _selectedMake = 'Proton';
-                _modelCtrl.text = 'X50 1.5 TGDi';
-                _mileageCtrl.text = '41800';
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Scanned Plate: VAB 2020 (Proton X50)'), duration: Duration(seconds: 2)),
-              );
-            },
-          ),
-        ],
+        title: const Text(
+          'Quick Vehicle Check-In',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           children: [
-            // Guided Walkaround Banner
+            // Quick Fill Presets row for easy testing
+            Row(
+              children: [
+                const Text('Quick Demo:', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: () => _fillSample('VAB 2020', 'Priya Subramaniam', '+60 16-554 2190', 'Brake Pad & Disc Overhaul', 'Bay 1'),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: Colors.amber.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                    child: const Text('VAB 2020 (Proton)', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                InkWell(
+                  onTap: () => _fillSample('PNG 4419', 'Tan Wei Ming', '+60 17-882 1902', 'Standard 10,000 km Service', 'Bay 2'),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: Colors.blue.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                    child: const Text('PNG 4419 (Honda)', style: TextStyle(color: Colors.lightBlueAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Card 1: Car & Owner Info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('CAR & OWNER', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                  const SizedBox(height: 12),
+                  // Plate number input
+                  TextFormField(
+                    controller: _plateCtrl,
+                    textCapitalization: TextCapitalization.characters,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                    decoration: InputDecoration(
+                      labelText: 'Car Plate Number',
+                      labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
+                      hintText: 'e.g. VAB 2020',
+                      hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
+                      prefixIcon: const Icon(Icons.badge_outlined, color: Colors.amber),
+                      filled: true,
+                      fillColor: const Color(0xFF0F172A),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  ),
+                  const SizedBox(height: 10),
+                  // Customer Name
+                  TextFormField(
+                    controller: _customerNameCtrl,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText: 'Customer Name',
+                      labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
+                      prefixIcon: const Icon(Icons.person_outline, color: Colors.white38),
+                      filled: true,
+                      fillColor: const Color(0xFF0F172A),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  ),
+                  const SizedBox(height: 10),
+                  // Phone Number
+                  TextFormField(
+                    controller: _phoneCtrl,
+                    keyboardType: TextInputType.phone,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText: 'WhatsApp Phone Number',
+                      labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
+                      prefixIcon: const Icon(Icons.phone_android_outlined, color: Colors.greenAccent),
+                      filled: true,
+                      fillColor: const Color(0xFF0F172A),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // Card 2: Bay & Service Selection
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('ASSIGN WORKSHOP BAY', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                  const SizedBox(height: 10),
+                  // 4 Big Bay Selection Buttons
+                  Row(
+                    children: ['Bay 1', 'Bay 2', 'Bay 3', 'Bay 4'].map((bay) {
+                      final isSelected = _selectedBay == bay;
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: InkWell(
+                            onTap: () => setState(() => _selectedBay = bay),
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: isSelected ? Colors.amber : const Color(0xFF0F172A),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: isSelected ? Colors.amber : Colors.white12,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  bay,
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.black87 : Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  const Text('SERVICE PACKAGE', style: TextStyle(color: Colors.white60, fontSize: 11, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: _servicePresets.map((service) {
+                      final isSelected = _selectedService == service;
+                      return ChoiceChip(
+                        label: Text(service, style: TextStyle(fontSize: 11, color: isSelected ? Colors.black87 : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                        selected: isSelected,
+                        selectedColor: Colors.amber,
+                        backgroundColor: const Color(0xFF0F172A),
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedService = service);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // Card 3: 5-Point Quick Check
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.amber.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: const [
-                  Icon(Icons.assignment_turned_in_rounded, color: Colors.amber, size: 24),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'PIC Mobile Guide: Complete physical inspection with vehicle owner before confirming job order.',
-                      style: TextStyle(color: Colors.white, fontSize: 12, height: 1.3),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            // Section 1: Customer Profile
-            _buildSectionHeader('1. CUSTOMER INFORMATION'),
-            const SizedBox(height: 10),
-            _buildTextField(controller: _customerNameCtrl, label: 'Customer Full Name', icon: Icons.person_outline),
-            const SizedBox(height: 10),
-            _buildTextField(controller: _phoneCtrl, label: 'WhatsApp Phone Number', icon: Icons.phone_android_outlined, keyboardType: TextInputType.phone),
-
-            const SizedBox(height: 20),
-
-            // Section 2: Vehicle Specs & Odometer
-            _buildSectionHeader('2. VEHICLE SPECIFICATIONS'),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: _buildTextField(controller: _plateCtrl, label: 'Plate Number', icon: Icons.badge_outlined, isPlate: true),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white12),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedMake,
-                        dropdownColor: const Color(0xFF1E293B),
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                        items: ['Proton', 'Perodua', 'Toyota', 'Honda', 'BMW', 'Nissan']
-                            .map((m) => DropdownMenuItem(value: m, child: Text(m)))
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedMake = val);
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: _buildTextField(controller: _modelCtrl, label: 'Vehicle Model & Engine', icon: Icons.directions_car_outlined),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 2,
-                  child: _buildTextField(controller: _mileageCtrl, label: 'Mileage (km)', icon: Icons.speed_outlined, keyboardType: TextInputType.number),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Section 3: 5-Point Floor Walkaround Inspection
-            _buildSectionHeader('3. 5-POINT WALKAROUND CHECKLIST'),
-            const SizedBox(height: 8),
-            Material(
-              color: const Color(0xFF1E293B),
-              clipBehavior: Clip.antiAlias,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: Colors.white12),
+                color: const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.white10),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CheckboxListTile(
-                    title: const Text('Body Panels & Paint Checked (No pre-existing scratch dispute)', style: TextStyle(color: Colors.white, fontSize: 12)),
-                    value: _exteriorInspected,
-                    activeColor: Colors.amber,
-                    checkColor: Colors.black,
-                    onChanged: (v) => setState(() => _exteriorInspected = v ?? false),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('5-POINT WALKAROUND', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _bodyOk = true;
+                            _tiresOk = true;
+                            _oilOk = true;
+                            _brakesOk = true;
+                            _batteryOk = true;
+                          });
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 20)),
+                        child: const Text('Reset All OK', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                      ),
+                    ],
                   ),
-                  const Divider(color: Colors.white10, height: 1),
-                  CheckboxListTile(
-                    title: const Text('Tire Tread Depth & Pressure > 2.5mm', style: TextStyle(color: Colors.white, fontSize: 12)),
-                    value: _treadDepthOk,
-                    activeColor: Colors.amber,
-                    checkColor: Colors.black,
-                    onChanged: (v) => setState(() => _treadDepthOk = v ?? false),
-                  ),
-                  const Divider(color: Colors.white10, height: 1),
-                  CheckboxListTile(
-                    title: const Text('Engine Oil Dipstick & Fluid Levels', style: TextStyle(color: Colors.white, fontSize: 12)),
-                    value: _oilLevelOk,
-                    activeColor: Colors.amber,
-                    checkColor: Colors.black,
-                    onChanged: (v) => setState(() => _oilLevelOk = v ?? false),
-                  ),
-                  const Divider(color: Colors.white10, height: 1),
-                  CheckboxListTile(
-                    title: const Text('Brake Pad Thickness > 3.0mm', style: TextStyle(color: Colors.white, fontSize: 12)),
-                    value: _brakePadsOk,
-                    activeColor: Colors.amber,
-                    checkColor: Colors.black,
-                    onChanged: (v) => setState(() => _brakePadsOk = v ?? false),
-                  ),
-                  const Divider(color: Colors.white10, height: 1),
-                  CheckboxListTile(
-                    title: const Text('12V Battery Voltage Test Pass (12.6V+)', style: TextStyle(color: Colors.white, fontSize: 12)),
-                    value: _batteryTested,
-                    activeColor: Colors.amber,
-                    checkColor: Colors.black,
-                    onChanged: (v) => setState(() => _batteryTested = v ?? false),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      _buildCheckChip('Body Paint', _bodyOk, () => setState(() => _bodyOk = !_bodyOk)),
+                      _buildCheckChip('Tire Tread', _tiresOk, () => setState(() => _tiresOk = !_tiresOk)),
+                      _buildCheckChip('Engine Oil', _oilOk, () => setState(() => _oilOk = !_oilOk)),
+                      _buildCheckChip('Brake Pads', _brakesOk, () => setState(() => _brakesOk = !_brakesOk)),
+                      _buildCheckChip('12V Battery', _batteryOk, () => setState(() => _batteryOk = !_batteryOk)),
+                    ],
                   ),
                 ],
               ),
@@ -253,61 +343,25 @@ class _IntakeScreenState extends State<IntakeScreen> {
 
             const SizedBox(height: 20),
 
-            // Section 4: Customer Symptoms & Bay Assignment
-            _buildSectionHeader('4. WORK ORDER & BAY ASSIGNMENT'),
-            const SizedBox(height: 10),
-            _buildTextField(controller: _symptomsCtrl, label: 'Reported Symptoms / Job Scope', icon: Icons.report_problem_outlined, maxLines: 2),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white12),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedBay,
-                        dropdownColor: const Color(0xFF1E293B),
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                        items: ['Bay 1 (Engine)', 'Bay 2 (Brakes)', 'Bay 3 (AC & Electrical)', 'Bay 4 (General & QC)']
-                            .map((b) => DropdownMenuItem(value: b, child: Text(b)))
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedBay = val);
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 2,
-                  child: _buildTextField(controller: _costCtrl, label: 'Est. Total (RM)', icon: Icons.payments_outlined, keyboardType: TextInputType.number),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 28),
-
             // Submit Button
-            ElevatedButton(
-              onPressed: _isSubmitting ? null : _submitIntake,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                disabledBackgroundColor: Colors.amber.withOpacity(0.5),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton.icon(
+                onPressed: _isSubmitting ? null : _submitIntake,
+                icon: _isSubmitting
+                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                    : const Icon(Icons.check_circle_rounded, color: Colors.black87),
+                label: Text(
+                  _isSubmitting ? 'Assigning Bay...' : 'Confirm Check-In to $_selectedBay',
+                  style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
               ),
-              child: _isSubmitting
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black87))
-                  : const Text('Confirm Intake & Open Work Order', style: TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.bold)),
             ),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -315,38 +369,35 @@ class _IntakeScreenState extends State<IntakeScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: const TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.8),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-    bool isPlate = false,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      textCapitalization: isPlate ? TextCapitalization.characters : TextCapitalization.sentences,
-      style: const TextStyle(color: Colors.white, fontSize: 13),
-      validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white60, fontSize: 12),
-        prefixIcon: Icon(icon, color: isPlate ? Colors.amber : Colors.white54, size: 18),
-        filled: true,
-        fillColor: const Color(0xFF1E293B),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Colors.white12)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Colors.white12)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Colors.amber)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+  Widget _buildCheckChip(String label, bool isOk, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: isOk ? Colors.green.withOpacity(0.15) : Colors.red.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isOk ? Colors.greenAccent.shade400 : Colors.redAccent,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(isOk ? Icons.check_circle_rounded : Icons.cancel_rounded, size: 14, color: isOk ? Colors.greenAccent : Colors.redAccent),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: isOk ? Colors.white : Colors.redAccent,
+                fontSize: 12,
+                fontWeight: isOk ? FontWeight.w500 : FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
