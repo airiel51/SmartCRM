@@ -22,7 +22,7 @@ const VIEW_TITLES = {
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('dashboard');
+  const [currentView, setCurrentView] = useState('mobile_pic');
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(true);
   const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(false);

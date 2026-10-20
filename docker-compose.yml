@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Relational Database Service
+  # 1. PostgreSQL 16 with native pgvector extension for AI Knowledge Base
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg16
     container_name: smartcrm_postgres
     restart: always
     environment:
@@ -14,14 +14,32 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/scripts/schema.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d smartcrm_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - smartcrm_network
 
-  # FastAPI Backend Service with Scikit-Learn & LangGraph AI Layer
+  # 2. Redis 7 for Celery background tasks, rate limiting, and agent short-term memory
+  redis:
+    image: redis:7-alpine
+    container_name: smartcrm_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartcrm_network
+
+  # 3. FastAPI Backend Service with Agentic AI Orchestrator
   backend:
     build:
       context: ./backend
@@ -29,20 +47,53 @@ services:
     container_name: smartcrm_backend
     restart: always
     environment:
-      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/smartcrm_db
-      USE_SQLITE_FALLBACK: "False"
-      PROJECT_NAME: SmartCRM
+      DATABASE_URL: postgresql+psycopg2://postgres:postgrespassword@postgres:5432/smartcrm_db
+      REDIS_URL: redis://redis:6379/0
+      PROJECT_NAME: "SmartCRM - Automotive Workshop Intelligence"
       API_V1_STR: /api/v1
-      SECRET_KEY: smartcrm-super-secret-key-production
+      SECRET_KEY: ${SECRET_KEY:-smartcrm-super-secret-key-production-change-me}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      WHATSAPP_BUSINESS_ACCOUNT_ID: ${WHATSAPP_BUSINESS_ACCOUNT_ID}
+      WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN}
+      WHATSAPP_WEBHOOK_VERIFY_TOKEN: ${WHATSAPP_WEBHOOK_VERIFY_TOKEN}
     ports:
       - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./backend:/app
+    networks:
+      - smartcrm_network
 
-  # React Frontend Dashboard Service
+  # 4. Celery Worker for Asynchronous Follow-ups & AI Pipelines
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smartcrm_celery_worker
+    restart: always
+    command: celery -A app.core.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgrespassword@postgres:5432/smartcrm_db
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-smartcrm-super-secret-key-production-change-me}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    networks:
+      - smartcrm_network
+
+  # 5. React + Vite + Tailwind Frontend Dashboard
   frontend:
     build:
       context: ./frontend
@@ -55,6 +106,13 @@ services:
       - VITE_API_BASE_URL=http://localhost:8000/api/v1
     depends_on:
       - backend
+    networks:
+      - smartcrm_network
 
 volumes:
   postgres_data:
+  redis_data:
+
+networks:
+  smartcrm_network:
+    driver: bridge
