@@ -61,7 +61,7 @@ export default function App() {
                 }}
                 title="Apex AutoWorks & Diagnostic Centre • SmartCRM CAT405"
               >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
+                <span className="live-pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
                 <span>SmartCRM • {VIEW_TITLES[currentView] || 'Overview'}</span>
               </div>
             </div>

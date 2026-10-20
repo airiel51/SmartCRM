@@ -54,6 +54,138 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
+/* ==========================================================================
+   Micro-animations & Motion System
+   ========================================================================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes livePulse {
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes floatDot {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-5px) scale(1.18);
+    opacity: 1;
+  }
+}
+
+@keyframes equalizerBounce {
+  0% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1.15);
+  }
+  100% {
+    transform: scaleY(0.35);
+  }
+}
+
+@keyframes ribbonShimmer {
+  0% {
+    opacity: 0.88;
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 2px 10px rgba(245, 158, 11, 0.3));
+  }
+  100% {
+    opacity: 0.88;
+  }
+}
+
+@keyframes radarPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes smoothTickerSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  15%, 85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.anim-fade-in {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-scale-in {
+  animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.live-pulse-dot {
+  animation: livePulse 2.2s infinite ease-in-out;
+}
+
+.waveform-bar.active-playing {
+  animation: equalizerBounce 0.52s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+
+.animated-scatter-dot {
+  animation: floatDot 3.2s ease-in-out infinite;
+  transform-origin: center;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.2s ease;
+  cursor: pointer;
+}
+
+.animated-scatter-dot:hover {
+  transform: scale(1.6) !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -333,20 +465,40 @@ body {
   justify-content: space-between;
   min-height: 105px;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease;
   cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .metric-card-pastel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px) scale(1.015);
 }
 
 .metric-card-pastel.lilac { background-color: var(--pastel-lilac); }
+.metric-card-pastel.lilac:hover {
+  box-shadow: 0 12px 24px -6px rgba(168, 85, 247, 0.22);
+}
+
 .metric-card-pastel.blue { background-color: var(--pastel-blue); }
+.metric-card-pastel.blue:hover {
+  box-shadow: 0 12px 24px -6px rgba(59, 130, 246, 0.22);
+}
+
 .metric-card-pastel.honey { background-color: var(--pastel-honey); }
+.metric-card-pastel.honey:hover {
+  box-shadow: 0 12px 24px -6px rgba(245, 158, 11, 0.24);
+}
+
 .metric-card-pastel.emerald { background-color: var(--pastel-emerald); }
+.metric-card-pastel.emerald:hover {
+  box-shadow: 0 12px 24px -6px rgba(16, 185, 129, 0.22);
+}
+
 .metric-card-pastel.rose { background-color: var(--pastel-rose); }
+.metric-card-pastel.rose:hover {
+  box-shadow: 0 12px 24px -6px rgba(239, 68, 68, 0.22);
+}
 
 .metric-card-header {
   display: flex;
@@ -364,18 +516,23 @@ body {
   background: #ffffff;
   color: #1a1d23;
   font-size: 0.74rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 4px 14px;
   border-radius: 9999px;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  transition: all 0.15s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .check-pill-btn:hover {
-  background: #f8fafc;
-  transform: scale(1.03);
+  background: #ffffff;
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.check-pill-btn:active {
+  transform: scale(0.93);
 }
 
 .metric-card-value {
@@ -523,12 +680,51 @@ body {
   vertical-align: middle;
 }
 
-.interactions-table tr:hover {
-  background: #fafbfd;
+.interactions-table tr {
+  position: relative;
+  transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease;
 }
 
-.interactions-table tr.selected-row {
-  background: #f7f9fd;
+.interactions-table tbody tr {
+  cursor: pointer;
+}
+
+.interactions-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.interactions-table tbody tr.selected-row {
+  background: #f1f5f9;
+}
+
+.interactions-table tbody tr td:first-child {
+  position: relative;
+}
+
+.interactions-table tbody tr td:first-child::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18%;
+  bottom: 18%;
+  width: 3.5px;
+  border-radius: 0 4px 4px 0;
+  background: #1c1e22;
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.interactions-table tbody tr:hover td:first-child::before {
+  opacity: 0.5;
+  transform: scaleY(0.85);
+  background: #3b82f6;
+}
+
+.interactions-table tbody tr.selected-row td:first-child::before {
+  opacity: 1;
+  transform: scaleY(1);
+  background: #1c1e22;
 }
 
 .table-checkbox {

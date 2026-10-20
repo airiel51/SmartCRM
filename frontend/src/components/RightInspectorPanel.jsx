@@ -264,17 +264,28 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
           </p>
         )}
 
-        {/* Audio Waveform with Red Scrubber */}
-        <div className="waveform-container" style={{ position: 'relative' }}>
+        {/* Audio Waveform with Red Scrubber & Interactive Seek */}
+        <div
+          className="waveform-container"
+          style={{ position: 'relative', cursor: 'pointer' }}
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const pct = Math.max(0, Math.min(1, clickX / rect.width));
+            setPlayProgress(Math.round(pct * 60));
+          }}
+          title="Click to seek audio position"
+        >
           {waveformHeights.map((h, idx) => {
             const isPlayed = (idx / waveformHeights.length) * 60 <= playProgress;
             return (
               <div
                 key={idx}
-                className="waveform-bar"
+                className={`waveform-bar ${isPlaying ? 'active-playing' : ''}`}
                 style={{
                   height: `${h}px`,
-                  background: isPlayed ? '#1c1e22' : '#cbd5e1',
+                  background: isPlayed ? (isPlaying ? '#10b981' : '#1c1e22') : '#cbd5e1',
+                  animationDelay: `${(idx % 7) * 0.08}s`,
                   transition: 'background 0.15s ease'
                 }}
               />
@@ -284,11 +295,17 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
           {/* Active playhead line and time */}
           <div
             className="waveform-scrubber-line"
-            style={{ left: `${(playProgress / 60) * 100}%` }}
+            style={{
+              left: `${(playProgress / 60) * 100}%`,
+              background: isPlaying ? '#10b981' : '#ef4444'
+            }}
           />
           <div
             className="waveform-time-label"
-            style={{ left: `${(playProgress / 60) * 100}%` }}
+            style={{
+              left: `${(playProgress / 60) * 100}%`,
+              background: isPlaying ? '#10b981' : '#1c1e22'
+            }}
           >
             {formatSeconds(playProgress)}
           </div>
@@ -299,7 +316,12 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
           <span
             className="speed-tag"
             onClick={handleCycleSpeed}
-            style={{ cursor: 'pointer', userSelect: 'none' }}
+            style={{
+              cursor: 'pointer',
+              userSelect: 'none',
+              transition: 'all 0.15s ease',
+              fontWeight: 800
+            }}
             title="Click to toggle playback speed"
           >
             {speed}
@@ -309,6 +331,7 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
             className="audio-btn skip-btn"
             title="Rewind 10s"
             onClick={() => handleSkip(-10)}
+            style={{ transition: 'transform 0.15s ease' }}
           >
             <span style={{ fontSize: '0.8rem' }}>↺ 10</span>
           </button>
@@ -317,6 +340,13 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
             className="play-pause-btn"
             onClick={() => setIsPlaying(!isPlaying)}
             title={isPlaying ? 'Pause' : 'Play'}
+            style={{
+              background: isPlaying ? '#10b981' : '#1c1e22',
+              color: '#ffffff',
+              boxShadow: isPlaying ? '0 0 0 4px rgba(16, 185, 129, 0.25), 0 4px 14px rgba(16, 185, 129, 0.4)' : 'none',
+              transform: isPlaying ? 'scale(1.06)' : 'scale(1)',
+              transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}
           >
             {isPlaying ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -334,6 +364,7 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
             className="audio-btn skip-btn"
             title="Forward 10s"
             onClick={() => handleSkip(10)}
+            style={{ transition: 'transform 0.15s ease' }}
           >
             <span style={{ fontSize: '0.8rem' }}>↻ 10</span>
           </button>

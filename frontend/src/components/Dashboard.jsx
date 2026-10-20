@@ -1,8 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Dashboard({ onSelectCustomer, onNavigateView }) {
   // Active selected row in table
   const [selectedRowId, setSelectedRowId] = useState(2);
+  const [hoveredDot, setHoveredDot] = useState(null);
+  const [tickerIndex, setTickerIndex] = useState(0);
+
+  const liveTickerEvents = [
+    '⚡ SmartCRM AI scheduled Michael Wong (Toyota Vios) for Bay 3',
+    '🔧 Bay 2: Proton X50 brake pads replaced & rotors skimmed',
+    '💬 WhatsApp: Priya Subramaniam confirmed quote RM 280.00',
+    '📅 Tan Wei Ming (Honda Civic RS) booked for Saturday 10:00 AM',
+    '🛡️ Autonomous scan: 2 overdue service reminders queued for dispatch'
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTickerIndex((prev) => (prev + 1) % liveTickerEvents.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
 
   // Automotive Workshop Inbound Streams & Inquiries
   const tableRows = [
@@ -277,34 +294,34 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
             <text x="405" y="132" fill="#8c94a4" fontSize="10" fontWeight="500">Voice-call</text>
             <text x="405" y="144" fill="#1a1d23" fontSize="10.5" fontWeight="700">98</text>
 
-            {/* Right Side: Organic Yellow/Golden Dot Matrix */}
+            {/* Right Side: Organic Yellow/Golden Dot Matrix with Interactive Micro-Telemetry */}
             {[
-              { cx: 485, cy: 30, r: 4.5, c: '#f4b228' },
-              { cx: 505, cy: 22, r: 6, c: '#f7d47a' },
-              { cx: 518, cy: 45, r: 3.5, c: '#f5b838' },
-              { cx: 535, cy: 32, r: 5, c: '#fcd36a' },
-              { cx: 550, cy: 25, r: 7, c: '#f4b228' },
-              { cx: 568, cy: 40, r: 4, c: '#f7d47a' },
-              { cx: 585, cy: 28, r: 5.5, c: '#f5b838' },
-              { cx: 605, cy: 35, r: 7.5, c: '#fcd36a' },
-              { cx: 622, cy: 22, r: 4, c: '#f4b228' },
-              { cx: 640, cy: 38, r: 5, c: '#f7d47a' },
-              { cx: 660, cy: 30, r: 6, c: '#f5b838' },
-              { cx: 495, cy: 65, r: 5, c: '#f7d47a' },
-              { cx: 520, cy: 75, r: 6.5, c: '#f4b228' },
-              { cx: 545, cy: 60, r: 4, c: '#fcd36a' },
-              { cx: 570, cy: 80, r: 7, c: '#f5b838' },
-              { cx: 595, cy: 68, r: 4.5, c: '#f7d47a' },
-              { cx: 620, cy: 85, r: 6, c: '#f4b228' },
-              { cx: 645, cy: 70, r: 5, c: '#f5b838' },
-              { cx: 665, cy: 80, r: 4, c: '#fcd36a' },
-              { cx: 505, cy: 110, r: 4, c: '#f7d47a' },
-              { cx: 530, cy: 118, r: 5.5, c: '#f5b838' },
-              { cx: 555, cy: 105, r: 6, c: '#f4b228' },
-              { cx: 580, cy: 120, r: 4.5, c: '#fcd36a' },
-              { cx: 605, cy: 112, r: 7, c: '#f5b838' },
-              { cx: 630, cy: 125, r: 5, c: '#f7d47a' },
-              { cx: 655, cy: 115, r: 4.5, c: '#f4b228' }
+              { cx: 485, cy: 30, r: 4.5, c: '#f4b228', plate: 'VAB 2020', bay: 'Bay 2', turn: '2.1h' },
+              { cx: 505, cy: 22, r: 6, c: '#f7d47a', plate: 'JRS 7731', bay: 'Bay 3', turn: '3.4h' },
+              { cx: 518, cy: 45, r: 3.5, c: '#f5b838', plate: 'PNG 4419', bay: 'Bay 1', turn: '1.2h' },
+              { cx: 535, cy: 32, r: 5, c: '#fcd36a', plate: 'WXY 8821', bay: 'Scan', turn: 'Pending' },
+              { cx: 550, cy: 25, r: 7, c: '#f4b228', plate: 'KV 5502', bay: 'Due', turn: '10 Days' },
+              { cx: 568, cy: 40, r: 4, c: '#f7d47a', plate: 'BEM 9901', bay: 'Bay 4', turn: '4.0h' },
+              { cx: 585, cy: 28, r: 5.5, c: '#f5b838', plate: 'PKG 1204', bay: 'Bay 1', turn: '1.5h' },
+              { cx: 605, cy: 35, r: 7.5, c: '#fcd36a', plate: 'WWQ 3320', bay: 'Bay 2', turn: '2.6h' },
+              { cx: 622, cy: 22, r: 4, c: '#f4b228', plate: 'ALB 7741', bay: 'Bay 3', turn: '3.1h' },
+              { cx: 640, cy: 38, r: 5, c: '#f7d47a', plate: 'VDE 8021', bay: 'Bay 4', turn: '1.8h' },
+              { cx: 660, cy: 30, r: 6, c: '#f5b838', plate: 'PPA 9011', bay: 'Bay 2', turn: '2.4h' },
+              { cx: 495, cy: 65, r: 5, c: '#f7d47a', plate: 'WVA 6123', bay: 'Bay 1', turn: '1.1h' },
+              { cx: 520, cy: 75, r: 6.5, c: '#f4b228', plate: 'JMT 4022', bay: 'Bay 3', turn: '3.6h' },
+              { cx: 545, cy: 60, r: 4, c: '#fcd36a', plate: 'KDC 7119', bay: 'Bay 2', turn: '2.2h' },
+              { cx: 570, cy: 80, r: 7, c: '#f5b838', plate: 'VCD 3004', bay: 'Bay 4', turn: '4.2h' },
+              { cx: 595, cy: 68, r: 4.5, c: '#f7d47a', plate: 'BKP 5510', bay: 'Bay 1', turn: '1.3h' },
+              { cx: 620, cy: 85, r: 6, c: '#f4b228', plate: 'PEN 8820', bay: 'Bay 3', turn: '2.9h' },
+              { cx: 645, cy: 70, r: 5, c: '#f5b838', plate: 'MC 4410', bay: 'Bay 2', turn: '2.0h' },
+              { cx: 665, cy: 80, r: 4, c: '#fcd36a', plate: 'WLL 9122', bay: 'Scan', turn: 'Hold' },
+              { cx: 505, cy: 110, r: 4, c: '#f7d47a', plate: 'JHB 3381', bay: 'Bay 1', turn: '1.0h' },
+              { cx: 530, cy: 118, r: 5.5, c: '#f5b838', plate: 'PL 7720', bay: 'Bay 3', turn: '3.8h' },
+              { cx: 555, cy: 105, r: 6, c: '#f4b228', plate: 'VRT 5011', bay: 'Bay 4', turn: '4.5h' },
+              { cx: 580, cy: 120, r: 4.5, c: '#fcd36a', plate: 'KAE 6620', bay: 'Bay 2', turn: '2.3h' },
+              { cx: 605, cy: 112, r: 7, c: '#f5b838', plate: 'BMW 3201', bay: 'Bay 1', turn: '1.7h' },
+              { cx: 630, cy: 125, r: 5, c: '#f7d47a', plate: 'PRP 8109', bay: 'Bay 3', turn: '3.0h' },
+              { cx: 655, cy: 115, r: 4.5, c: '#f4b228', plate: 'VDG 4490', bay: 'Bay 2', turn: '2.5h' }
             ].map((dot, idx) => (
               <circle
                 key={idx}
@@ -312,9 +329,26 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
                 cy={dot.cy}
                 r={dot.r}
                 fill={dot.c}
-                opacity={0.85}
+                opacity={0.88}
+                className="animated-scatter-dot"
+                onMouseEnter={() => setHoveredDot(dot)}
+                onMouseLeave={() => setHoveredDot(null)}
+                style={{
+                  animationDelay: `${(idx % 8) * 0.35}s`,
+                  animationDuration: `${2.4 + (idx % 4) * 0.4}s`
+                }}
               />
             ))}
+
+            {/* Interactive SVG Hover Tooltip for Scatter Dot */}
+            {hoveredDot && (
+              <g transform={`translate(${Math.min(580, Math.max(480, hoveredDot.cx - 50))}, ${Math.max(12, hoveredDot.cy - 30)})`}>
+                <rect width="118" height="24" rx="6" fill="#1c1e22" opacity="0.95" />
+                <text x="59" y="15" fill="#ffffff" fontSize="9.5" fontWeight="700" textAnchor="middle">
+                  {hoveredDot.plate} • {hoveredDot.turn}
+                </text>
+              </g>
+            )}
           </svg>
         </div>
       </div>
@@ -392,6 +426,35 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Floating Live Autonomous Workshop Activity Ticker */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 22,
+          right: 336,
+          background: '#1c1e22',
+          color: '#ffffff',
+          padding: '8px 16px',
+          borderRadius: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          fontSize: '0.78rem',
+          fontWeight: 600,
+          zIndex: 100,
+          backdropFilter: 'blur(8px)',
+          transition: 'all 0.3s ease'
+        }}
+      >
+        <span className="live-pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
+        <span style={{ color: '#10b981', fontWeight: 800, letterSpacing: 0.5, fontSize: '0.72rem' }}>LIVE PIC FEED</span>
+        <span style={{ color: '#64748b' }}>•</span>
+        <span style={{ animation: 'smoothTickerSlide 4.5s ease-in-out infinite' }}>
+          {liveTickerEvents[tickerIndex]}
+        </span>
       </div>
     </div>
   );

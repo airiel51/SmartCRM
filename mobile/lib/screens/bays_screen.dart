@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/whatsapp_launcher.dart';
 import '../models/models.dart';
+import 'dashboard_screen.dart' show BouncingTouchCard, PulsingDot;
 
 class BaysScreen extends StatefulWidget {
   final Function(int, {String? defaultBay})? onNavigateTab;
@@ -11,9 +12,10 @@ class BaysScreen extends StatefulWidget {
   State<BaysScreen> createState() => _BaysScreenState();
 }
 
-class _BaysScreenState extends State<BaysScreen> {
+class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   List<ServiceOrderModel> _services = [];
+  late AnimationController _fadeCtrl;
 
   final List<String> _stages = [
     'Scheduled',
@@ -26,7 +28,14 @@ class _BaysScreenState extends State<BaysScreen> {
   @override
   void initState() {
     super.initState();
+    _fadeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     _loadServices();
+  }
+
+  @override
+  void dispose() {
+    _fadeCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _loadServices() async {
@@ -37,6 +46,7 @@ class _BaysScreenState extends State<BaysScreen> {
         _services = list;
         _isLoading = false;
       });
+      _fadeCtrl.forward(from: 0);
     }
   }
 
@@ -66,8 +76,16 @@ class _BaysScreenState extends State<BaysScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${s.vehiclePlate} updated to $nextStage'),
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Text('${s.vehiclePlate} updated to $nextStage', style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
             backgroundColor: nextStage == 'Ready for Pickup' ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -76,7 +94,7 @@ class _BaysScreenState extends State<BaysScreen> {
   }
 
   void _notifyCustomerReady(ServiceOrderModel s) {
-    final msg = "Hello ${s.customerName}! Your vehicle (${s.vehiclePlate}) is inspected and ready for pickup at Apex AutoWorks. Thank you!";
+    final msg = "Hello ${s.customerName}! Your vehicle (${s.vehiclePlate}) is inspected and ready for collection at Apex AutoWorks. Thank you!";
     WhatsAppLauncher.openChat(
       phone: "+60165542190",
       message: msg,
@@ -102,9 +120,15 @@ class _BaysScreenState extends State<BaysScreen> {
               'Apex AutoWorks',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
             ),
-            Text(
-              '$occupiedCount of 4 bays in use',
-              style: const TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                const PulsingDot(color: Color(0xFFD97706), size: 5),
+                const SizedBox(width: 5),
+                Text(
+                  '$occupiedCount of 4 bays active',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ],
         ),
@@ -120,26 +144,31 @@ class _BaysScreenState extends State<BaysScreen> {
           : RefreshIndicator(
               onRefresh: _loadServices,
               color: const Color(0xFFF59E0B),
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                children: allBays.map((bayName) {
-                  final order = activeOrders.firstWhere(
-                    (s) => s.serviceBay.toLowerCase().contains(bayName.toLowerCase()),
-                    orElse: () => ServiceOrderModel(
-                      id: '-1',
-                      customerName: '',
-                      vehiclePlate: '',
-                      serviceType: '',
-                      stage: 'Vacant',
-                      serviceBay: bayName,
-                      symptomsReported: '',
-                      technicianNotes: '',
-                      totalAmount: 0,
-                    ),
-                  );
+              child: FadeTransition(
+                opacity: _fadeCtrl,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  itemCount: allBays.length,
+                  itemBuilder: (context, idx) {
+                    final bayName = allBays[idx];
+                    final order = activeOrders.firstWhere(
+                      (s) => s.serviceBay.toLowerCase().contains(bayName.toLowerCase()),
+                      orElse: () => ServiceOrderModel(
+                        id: '-1',
+                        customerName: '',
+                        vehiclePlate: '',
+                        serviceType: '',
+                        stage: 'Vacant',
+                        serviceBay: bayName,
+                        symptomsReported: '',
+                        technicianNotes: '',
+                        totalAmount: 0,
+                      ),
+                    );
 
-                  return _buildBayCard(bayName, order);
-                }).toList(),
+                    return _buildBayCard(bayName, order);
+                  },
+                ),
               ),
             ),
     );
@@ -150,33 +179,51 @@ class _BaysScreenState extends State<BaysScreen> {
 
     Color badgeBg;
     Color badgeText;
+    Color dotColor;
     String statusLabel;
+    int currentStep = 0;
 
     if (!isOccupied) {
       badgeBg = const Color(0xFFECFDF5);
       badgeText = const Color(0xFF059669);
+      dotColor = const Color(0xFF10B981);
       statusLabel = 'Available';
     } else {
       switch (s.stage) {
+        case 'Scheduled':
+          badgeBg = const Color(0xFFF3E8FF);
+          badgeText = const Color(0xFF7C3AED);
+          dotColor = const Color(0xFF8B5CF6);
+          statusLabel = 'Scheduled';
+          currentStep = 1;
+          break;
         case 'In Progress':
           badgeBg = const Color(0xFFFEF3C7);
           badgeText = const Color(0xFFD97706);
+          dotColor = const Color(0xFFF59E0B);
           statusLabel = 'In Service';
+          currentStep = 2;
           break;
         case 'Quality Inspection':
           badgeBg = const Color(0xFFEFF6FF);
           badgeText = const Color(0xFF2563EB);
+          dotColor = const Color(0xFF3B82F6);
           statusLabel = 'Final Check';
+          currentStep = 3;
           break;
         case 'Ready for Pickup':
           badgeBg = const Color(0xFFECFDF5);
           badgeText = const Color(0xFF059669);
+          dotColor = const Color(0xFF10B981);
           statusLabel = 'Ready';
+          currentStep = 4;
           break;
         default:
-          badgeBg = const Color(0xFFF3E8FF);
-          badgeText = const Color(0xFF7C3AED);
+          badgeBg = const Color(0xFFF1F5F9);
+          badgeText = const Color(0xFF64748B);
+          dotColor = const Color(0xFF94A3B8);
           statusLabel = 'Waiting';
+          currentStep = 1;
       }
     }
 
@@ -237,14 +284,21 @@ class _BaysScreenState extends State<BaysScreen> {
                     color: badgeBg,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    statusLabel,
-                    style: TextStyle(
-                      color: badgeText,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.3,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PulsingDot(color: dotColor, size: 5),
+                      const SizedBox(width: 5),
+                      Text(
+                        statusLabel,
+                        style: TextStyle(
+                          color: badgeText,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -253,13 +307,12 @@ class _BaysScreenState extends State<BaysScreen> {
             const SizedBox(height: 12),
 
             if (!isOccupied)
-              InkWell(
+              BouncingTouchCard(
                 onTap: () {
                   if (widget.onNavigateTab != null) {
                     widget.onNavigateTab!(1, defaultBay: bayName);
                   }
                 },
-                borderRadius: BorderRadius.circular(12),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -332,60 +385,90 @@ class _BaysScreenState extends State<BaysScreen> {
                 ],
               ),
 
+              const SizedBox(height: 12),
+
+              // Animated Stage Progress Step Indicator (1 to 4)
+              _buildStageStepper(currentStep),
+
               const SizedBox(height: 14),
 
-              // Action Buttons
+              // Action Buttons with Spring Feedback
               if (s.stage == 'Ready for Pickup')
                 Row(
                   children: [
                     Expanded(
                       flex: 3,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _notifyCustomerReady(s),
-                        icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
-                        label: const Text('WhatsApp Customer', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981),
+                      child: BouncingTouchCard(
+                        onTap: () => _notifyCustomerReady(s),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
+                              SizedBox(width: 6),
+                              Text('WhatsApp Customer', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       flex: 2,
-                      child: OutlinedButton(
-                        onPressed: () => _advanceStage(s),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFFCBD5E1)),
+                      child: BouncingTouchCard(
+                        onTap: () => _advanceStage(s),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFCBD5E1)),
+                          ),
+                          child: const Center(
+                            child: Text('Clear Bay', style: TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.bold)),
+                          ),
                         ),
-                        child: const Text('Clear Bay', style: TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
                 )
               else
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _advanceStage(s),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: s.stage == 'In Progress' ? const Color(0xFF2563EB) : const Color(0xFFF59E0B),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                BouncingTouchCard(
+                  onTap: () => _advanceStage(s),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: s.stage == 'In Progress' ? const Color(0xFF2563EB) : const Color(0xFFF59E0B),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (s.stage == 'In Progress' ? const Color(0xFF2563EB) : const Color(0xFFF59E0B)).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      s.stage == 'Scheduled'
-                          ? 'Start Work in $bayName ➔'
-                          : s.stage == 'In Progress'
-                              ? 'Move to Final Check ➔'
-                              : 'Mark Ready for Pickup ➔',
-                      style: TextStyle(
-                        color: s.stage == 'In Progress' ? Colors.white : const Color(0xFF0F172A),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 13,
+                    child: Center(
+                      child: Text(
+                        s.stage == 'Scheduled'
+                            ? 'Start Work in $bayName ➔'
+                            : s.stage == 'In Progress'
+                                ? 'Move to Final Check ➔'
+                                : 'Mark Ready for Pickup ➔',
+                        style: TextStyle(
+                          color: s.stage == 'In Progress' ? Colors.white : const Color(0xFF0F172A),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ),
@@ -394,6 +477,43 @@ class _BaysScreenState extends State<BaysScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStageStepper(int currentStep) {
+    const steps = ['Booked', 'Service', 'Check', 'Ready'];
+    return Row(
+      children: List.generate(steps.length, (i) {
+        final stepNum = i + 1;
+        final isPassed = stepNum <= currentStep;
+        final isCurrent = stepNum == currentStep;
+
+        return Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 3.5,
+                  decoration: BoxDecoration(
+                    color: isPassed ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              if (i < steps.length - 1)
+                Container(
+                  width: 6,
+                  height: 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    color: isPassed ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
