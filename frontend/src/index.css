@@ -1316,3 +1316,29 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+
+/* ==========================================================================
+   Agentic AI Chatbot Widget (Omnipresent on every page)
+   ========================================================================== */
+.agentic-chatbot-fab:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 14px 35px -4px rgba(28, 30, 34, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.agentic-chatbot-fab:active {
+  transform: scale(0.96) !important;
+}
+
+.agentic-chatbot-container {
+  font-family: var(--font-main);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agentic-chatbot-container.popup-mode {
+  border-radius: 20px;
+}
+
+.agentic-chatbot-container.expanded-mode {
+  border-radius: 16px 0 0 16px;
+}
+

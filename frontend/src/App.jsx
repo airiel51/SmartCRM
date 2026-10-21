@@ -7,7 +7,7 @@ import WhatsAppLiveHub from './components/WhatsAppLiveHub';
 import AgenticAISuite from './components/AgenticAISuite';
 import SupabaseSyncView from './components/SupabaseSyncView';
 import RightInspectorPanel from './components/RightInspectorPanel';
-import AICopilotDrawer from './components/AICopilotDrawer';
+import AgenticAIChatbotWidget from './components/AgenticAIChatbotWidget';
 import { AddCustomerModal, AddServiceModal } from './components/Modals';
 
 const VIEW_TITLES = {
@@ -165,10 +165,14 @@ export default function App() {
         />
       </div>
 
-      {/* Floating AI Copilot Slide-Over Drawer */}
-      <AICopilotDrawer
+      {/* Omnipresent Agentic AI Chatbot Widget (Appears on EVERY page) */}
+      <AgenticAIChatbotWidget
         isOpen={isCopilotOpen}
-        onClose={() => setIsCopilotOpen(false)}
+        onToggle={() => setIsCopilotOpen(!isCopilotOpen)}
+        currentView={currentView}
+        selectedCustomer={selectedCustomer}
+        onNavigateView={setCurrentView}
+        onSelectCustomer={setSelectedCustomer}
       />
 
       {/* Modals */}

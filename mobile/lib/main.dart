@@ -3,6 +3,7 @@ import 'screens/dashboard_screen.dart';
 import 'screens/bays_screen.dart';
 import 'screens/retention_screen.dart';
 import 'screens/fleet_screen.dart';
+import 'widgets/agentic_ai_chatbot_sheet.dart';
 
 void main() {
   runApp(const ApexAutoWorksApp());
@@ -79,6 +80,35 @@ class _MainWorkshopNavigationState extends State<MainWorkshopNavigation> {
         child: KeyedSubtree(
           key: ValueKey<int>(_currentIndex),
           child: screens[_currentIndex],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => AgenticAIChatbotSheet.show(context, onNavigateTab: _navigateTab),
+        backgroundColor: const Color(0xFF1E293B),
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        icon: const Icon(Icons.auto_awesome_rounded, color: Color(0xFFF59E0B), size: 18),
+        label: Row(
+          children: [
+            const Text(
+              'Agentic AI',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 12,
+                letterSpacing: 0.3,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: Color(0xFF10B981),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: Container(
