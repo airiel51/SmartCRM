@@ -1,25 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export default function Dashboard({ onSelectCustomer, onNavigateView }) {
   // Active selected row in table
   const [selectedRowId, setSelectedRowId] = useState(2);
   const [hoveredDot, setHoveredDot] = useState(null);
-  const [tickerIndex, setTickerIndex] = useState(0);
-
-  const liveTickerEvents = [
-    '⚡ SmartCRM AI scheduled Michael Wong (Toyota Vios) for Bay 3',
-    '🔧 Bay 2: Proton X50 brake pads replaced & rotors skimmed',
-    '💬 WhatsApp: Priya Subramaniam confirmed quote RM 280.00',
-    '📅 Tan Wei Ming (Honda Civic RS) booked for Saturday 10:00 AM',
-    '🛡️ Autonomous scan: 2 overdue service reminders queued for dispatch'
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % liveTickerEvents.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
 
   // Automotive Workshop Inbound Streams & Inquiries
   const tableRows = [
@@ -40,7 +24,7 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
         online: true,
         messages: [
           { time: '2:15 PM', role: 'Michael', text: 'Hi Airiel, Toyota Vios plate JRS 7731 aircond suddenly not cold at all, only blowing hot air! Need urgent inspection please.' },
-          { time: '2:20 PM', role: 'SmartCRM AI', text: 'NLP Extracted: Plate JRS 7731. Symptom: AC lukewarm/compressor. Recommended: Aircond Flush & R134a Regas (Est. RM 210.00).', isInitials: true, initials: 'AI' },
+          { time: '2:20 PM', role: 'SmartCRM Assistant', text: 'Vehicle identified: JRS 7731. Reported issue: AC blowing warm air. Recommended: Aircond Flush & R134a Regas (Est. RM 210.00).', isInitials: true, initials: 'AI' },
           { time: '2:34 PM', role: 'Airiel (PIC)', text: 'Assigned to Bay 3. Tech has vacuumed system and found cabin filter clogged. Regas underway.', isInitials: true, initials: 'PIC' }
         ],
         callTime: '00:18'
@@ -63,7 +47,7 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
         online: true,
         messages: [
           { time: '1:12 PM', role: 'Priya', text: 'Salam Airiel, my Proton X50 plate VAB 2020 has high pitched squeak when I step on brakes near Bayan Lepas. Can I drop by?' },
-          { time: '1:15 PM', role: 'SmartCRM AI', text: 'Extracted Plate VAB 2020. Symptom: Brake System Friction. Recommended: Ceramic Brake Pads & Rotor Skimming (Est RM 280.00).', isInitials: true, initials: 'AI' },
+          { time: '1:15 PM', role: 'SmartCRM Assistant', text: 'Vehicle identified: VAB 2020. Reported issue: Brake squeaking noise. Recommended: Ceramic Brake Pads & Rotor Skimming (Est RM 280.00).', isInitials: true, initials: 'AI' },
           { time: '2:02 PM', role: 'Airiel (PIC)', text: 'Front pads worn to 2.5mm. Rotors skimmed on lathe. Ready by 4:30 PM!', isInitials: true, initials: 'PIC' }
         ],
         callTime: '00:32'
@@ -74,7 +58,7 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
       type: 'Retention',
       typeClass: 'failed',
       callerId: '+60 12-345 6789',
-      destination: 'Autonomous Retention AI',
+      destination: 'Service Reminder',
       status: 'Overdue Alert',
       statusClass: 'failed',
       date: 'Today, 1:50 PM',
@@ -85,8 +69,8 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
         phone: '+60 12-345 6789',
         online: false,
         messages: [
-          { time: '1:45 PM', role: 'AI Scanner', text: 'Odometer 58,400km is 3,400km (30 days) past 55,000km service threshold. Churn risk: High (83.9%).', isInitials: true, initials: 'AI' },
-          { time: '1:50 PM', role: 'Airiel (PIC)', text: 'Automated WhatsApp retention reminder drafted with Bay 1 priority hold.', isInitials: true, initials: 'PIC' }
+          { time: '1:45 PM', role: 'System', text: 'Odometer 58,400km is 3,400km past 55,000km threshold. Service reminder queued.', isInitials: true, initials: 'SYS' },
+          { time: '1:50 PM', role: 'Airiel (PIC)', text: 'Service reminder ready for WhatsApp dispatch.', isInitials: true, initials: 'PIC' }
         ],
         callTime: '00:00'
       }
@@ -118,7 +102,7 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
       type: 'Retention',
       typeClass: 'pending',
       callerId: '+60 11-2345 9918',
-      destination: 'Autonomous Retention AI',
+      destination: 'Service Reminder',
       status: 'Due Soon',
       statusClass: 'pending',
       date: 'Today, 7:12 AM',
@@ -129,8 +113,8 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
         phone: '+60 11-2345 9918',
         online: true,
         messages: [
-          { time: '7:08 AM', role: 'AI Scanner', text: 'Scheduled mileage 45,000km approaching (currently 44,500km). Recommended: Engine Oil & 25-Point Safety Check.', isInitials: true, initials: 'AI' },
-          { time: '7:12 AM', role: 'Airiel (PIC)', text: 'Retention notification ready for WhatsApp dispatch.', isInitials: true, initials: 'PIC' }
+          { time: '7:08 AM', role: 'System', text: 'Scheduled mileage 45,000km approaching (currently 44,500km). Recommended: Engine Oil & Inspection.', isInitials: true, initials: 'SYS' },
+          { time: '7:12 AM', role: 'Airiel (PIC)', text: 'Service reminder ready for WhatsApp dispatch.', isInitials: true, initials: 'PIC' }
         ],
         callTime: '00:45'
       }
@@ -151,35 +135,35 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
         {/* Card 1: Lavender / Fleet Under Care */}
         <div className="metric-card-pastel lilac">
           <div className="metric-card-header">
-            <span className="metric-card-title">Fleet Under Care</span>
+            <span className="metric-card-title">Vehicles Under Care</span>
             <button className="check-pill-btn" onClick={() => onNavigateView && onNavigateView('customers')}>Fleet</button>
           </div>
           <div className="metric-card-value">186 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#6b7280' }}>Vehicles</span></div>
         </div>
 
-        {/* Card 2: Sky Blue / Overdue Retention Scans */}
+        {/* Card 2: Sky Blue / Overdue Services */}
         <div className="metric-card-pastel blue">
           <div className="metric-card-header">
-            <span className="metric-card-title">Overdue Retention Scans</span>
-            <button className="check-pill-btn" onClick={() => onNavigateView && onNavigateView('agentic_ai')}>Scan</button>
+            <span className="metric-card-title">Overdue Services</span>
+            <button className="check-pill-btn" onClick={() => onNavigateView && onNavigateView('customers')}>View</button>
           </div>
-          <div className="metric-card-value">2 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#dc2626' }}>Overdue Alerts</span></div>
+          <div className="metric-card-value">2 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#dc2626' }}>Requires Attention</span></div>
         </div>
 
         {/* Card 3: Warm Honey / Repeat-Service Rate */}
         <div className="metric-card-pastel honey">
           <div className="metric-card-header">
-            <span className="metric-card-title">Repeat-Service Rate (CAT405)</span>
+            <span className="metric-card-title">Repeat-Service Rate</span>
             <button className="check-pill-btn" onClick={() => onNavigateView && onNavigateView('pipeline')}>Bays</button>
           </div>
-          <div className="metric-card-value">74.2% <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#16a34a' }}>Loyalty Benchmark</span></div>
+          <div className="metric-card-value">74.2% <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#16a34a' }}>30-Day Retention</span></div>
         </div>
       </div>
 
       {/* Campaign Overview Card (Stream Curves + Dot Matrix) */}
       <div className="overview-chart-card">
         <div className="overview-card-header">
-          <h2 className="overview-title">Workshop Service & Campaign Demand (Penang)</h2>
+          <h2 className="overview-title">Monthly Service Volume & Customer Inquiries</h2>
 
           <div className="overview-tools">
             <button className="filter-btn">
@@ -428,34 +412,6 @@ export default function Dashboard({ onSelectCustomer, onNavigateView }) {
         </table>
       </div>
 
-      {/* Floating Live Autonomous Workshop Activity Ticker */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 22,
-          right: 336,
-          background: '#1c1e22',
-          color: '#ffffff',
-          padding: '8px 16px',
-          borderRadius: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-          fontSize: '0.78rem',
-          fontWeight: 600,
-          zIndex: 100,
-          backdropFilter: 'blur(8px)',
-          transition: 'all 0.3s ease'
-        }}
-      >
-        <span className="live-pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
-        <span style={{ color: '#10b981', fontWeight: 800, letterSpacing: 0.5, fontSize: '0.72rem' }}>LIVE PIC FEED</span>
-        <span style={{ color: '#64748b' }}>•</span>
-        <span style={{ animation: 'smoothTickerSlide 4.5s ease-in-out infinite' }}>
-          {liveTickerEvents[tickerIndex]}
-        </span>
-      </div>
     </div>
   );
 }

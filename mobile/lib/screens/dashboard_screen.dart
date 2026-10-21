@@ -324,7 +324,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                             ),
                             const SizedBox(width: 12),
                             _buildPastelCard(
-                              title: 'Repeat-Service Rate (CAT405)',
+                              title: 'Repeat-Service Rate',
                               tag: 'Bays',
                               value: '74.2%',
                               unit: 'Loyalty Benchmark',
@@ -476,11 +476,6 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
 
                   const SizedBox(height: 14),
 
-                  // Animated Live PIC Activity Ticker
-                  const _WorkshopActivityTicker(),
-
-                  const SizedBox(height: 14),
-
                   // 3. Workshop Inquiries & Feed Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -545,7 +540,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                     phone: '+60 12-345 6789',
                     name: 'Ahmad Razali',
                     plate: 'WXY 8821',
-                    destination: 'Autonomous Retention AI',
+                    destination: 'Service Reminder',
                     status: 'Overdue Alert',
                     statusColor: const Color(0xFFDC2626),
                     time: 'Today, 1:50 PM',
@@ -1024,103 +1019,4 @@ class _AnimatedDiagnosticWaveformState extends State<AnimatedDiagnosticWaveform>
   }
 }
 
-class _WorkshopActivityTicker extends StatefulWidget {
-  const _WorkshopActivityTicker({Key? key}) : super(key: key);
-
-  @override
-  State<_WorkshopActivityTicker> createState() => _WorkshopActivityTickerState();
-}
-
-class _WorkshopActivityTickerState extends State<_WorkshopActivityTicker> {
-  int _idx = 0;
-  Timer? _timer;
-
-  final List<String> _events = [
-    'AI scheduled Michael Wong (Toyota Vios) for Bay 3',
-    'Bay 2: Proton X50 brake pads replaced & rotors skimmed',
-    'WhatsApp: Priya Subramaniam confirmed quote RM 280.00',
-    'Tan Wei Ming (Honda Civic RS) booked for Saturday 10:00 AM',
-    'Autonomous scan: 2 overdue service reminders queued',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 4), (t) {
-      if (mounted) {
-        setState(() => _idx = (_idx + 1) % _events.length);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const PulsingDot(color: Color(0xFF10B981), size: 7),
-          const SizedBox(width: 8),
-          const Text(
-            'LIVE PIC',
-            style: TextStyle(
-              color: Color(0xFF10B981),
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(width: 3, height: 3, decoration: const BoxDecoration(color: Color(0xFF64748B), shape: BoxShape.circle)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 320),
-              transitionBuilder: (child, anim) {
-                return FadeTransition(
-                  opacity: anim,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.35),
-                      end: Offset.zero,
-                    ).animate(anim),
-                    child: child,
-                  ),
-                );
-              },
-              child: Text(
-                _events[_idx],
-                key: ValueKey<int>(_idx),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 

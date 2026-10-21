@@ -12,11 +12,11 @@ import { AddCustomerModal, AddServiceModal } from './components/Modals';
 
 const VIEW_TITLES = {
   dashboard: 'Overview',
-  whatsapp: 'WhatsApp AI Live',
-  pipeline: 'Service Bays & Pipeline',
-  customers: 'Fleet Directory',
-  supabase: 'Supabase Cloud Sync',
-  agentic_ai: 'Agentic AI Suite'
+  whatsapp: 'WhatsApp Messages',
+  pipeline: 'Service Bays',
+  customers: 'Customers & Vehicles',
+  supabase: 'Settings & Cloud Sync',
+  agentic_ai: 'Assistant'
 };
 
 export default function App() {
@@ -59,10 +59,10 @@ export default function App() {
                   border: '1px solid #edf0f5',
                   whiteSpace: 'nowrap'
                 }}
-                title="Apex AutoWorks & Diagnostic Centre • SmartCRM CAT405"
+                title="Apex AutoWorks • SmartCRM"
               >
-                <span className="live-pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
-                <span>SmartCRM • {VIEW_TITLES[currentView] || 'Overview'}</span>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
+                <span>Apex AutoWorks • {VIEW_TITLES[currentView] || 'Overview'}</span>
               </div>
             </div>
 
@@ -103,9 +103,9 @@ export default function App() {
                 className="btn btn-secondary btn-sm"
                 onClick={() => setIsCopilotOpen(true)}
                 style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
-                title="Autonomous AI Copilot Drawer"
+                title="Workshop Assistant"
               >
-                <span>⚡ Copilot</span>
+                <span>Assistant</span>
               </button>
 
               <button

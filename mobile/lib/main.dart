@@ -85,30 +85,17 @@ class _MainWorkshopNavigationState extends State<MainWorkshopNavigation> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => AgenticAIChatbotSheet.show(context, onNavigateTab: _navigateTab),
         backgroundColor: const Color(0xFF1E293B),
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        icon: const Icon(Icons.auto_awesome_rounded, color: Color(0xFFF59E0B), size: 18),
-        label: Row(
-          children: [
-            const Text(
-              'Agentic AI',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 12,
-                letterSpacing: 0.3,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Container(
-              width: 6,
-              height: 6,
-              decoration: const BoxDecoration(
-                color: Color(0xFF10B981),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
+        label: const Text(
+          'Assistant',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+            letterSpacing: 0.2,
+          ),
         ),
       ),
       bottomNavigationBar: Container(

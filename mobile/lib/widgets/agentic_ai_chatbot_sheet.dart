@@ -27,22 +27,22 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
   final List<Map<String, dynamic>> _messages = [
     {
       'role': 'ai',
-      'text': 'Salam & Hello Airiel! I am your SmartCRM Autonomous Copilot. I continuously monitor bays, customer retention cycles, and incoming WhatsApp inquiries.\n\nCurrently tracking 186 fleet vehicles with 18 overdue intervals and RM 8,420 in recoverable churn revenue. How can I assist floor operations right now?',
+      'text': 'Hello Airiel. I can look up vehicle records, check workshop bay allocations, draft service quotes, or summarize incoming customer messages. How can I help?',
       'time': 'Just now',
       'actions': [
-        {'label': '🔥 Overdue Cars', 'query': 'Show me overdue vehicles', 'tab': 3},
-        {'label': '🔧 Bay Occupancy', 'query': 'What is our current bay occupancy?', 'tab': 1},
-        {'label': '💬 Inbound WhatsApp', 'query': 'Check WhatsApp customer inquiries', 'tab': 2},
+        {'label': 'Overdue Vehicles', 'query': 'Show me overdue vehicles', 'tab': 3},
+        {'label': 'Bay Occupancy', 'query': 'What is our current bay occupancy?', 'tab': 1},
+        {'label': 'WhatsApp Inquiries', 'query': 'Check WhatsApp customer inquiries', 'tab': 2},
       ]
     }
   ];
 
   final List<String> _quickSuggestions = [
-    'Overdue Myvi & Bezza',
-    'Bay 1-4 active status',
-    'High churn risk accounts',
+    'Overdue vehicles',
+    'Bay occupancy',
+    'Customer inquiries',
     'Repeat-service rate',
-    'Staged AC flush quote',
+    'Service quote estimate',
   ];
 
   @override
@@ -84,13 +84,13 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
     List<Map<String, dynamic>> actions = [];
     final lower = query.toLowerCase();
     if (lower.contains('bay') || lower.contains('occupan')) {
-      actions.add({'label': '🔧 Jump to Bays Tab', 'tab': 1});
+      actions.add({'label': 'Jump to Bays', 'tab': 1});
     }
     if (lower.contains('overdue') || lower.contains('customer') || lower.contains('fleet')) {
-      actions.add({'label': '🚗 View Fleet Directory', 'tab': 3});
+      actions.add({'label': 'Fleet Directory', 'tab': 3});
     }
     if (lower.contains('reminder') || lower.contains('whatsapp')) {
-      actions.add({'label': '💬 View Reminders', 'tab': 2});
+      actions.add({'label': 'View Reminders', 'tab': 2});
     }
 
     if (mounted) {
@@ -143,26 +143,20 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
                     color: const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.auto_awesome_rounded, color: Color(0xFFF59E0B), size: 18),
+                  child: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: const [
-                          Text(
-                            'SmartCRM Agentic AI',
-                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF0F172A)),
-                          ),
-                          SizedBox(width: 6),
-                          PulsingDot(color: Color(0xFF10B981), size: 6),
-                        ],
+                    children: const [
+                      Text(
+                        'Workshop Assistant',
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: Color(0xFF0F172A)),
                       ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        'Autonomous Workshop Floor Copilot • CAT405',
+                      SizedBox(height: 2),
+                      Text(
+                        'Apex AutoWorks • Online',
                         style: TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -199,7 +193,7 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
                     child: Center(
                       child: Text(
                         suggestion,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
                       ),
                     ),
                   ),
@@ -231,9 +225,9 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
                             color: isUser ? const Color(0xFF1E293B) : Colors.white,
-                            borderRadius: BorderRadius.circular(16).copyWith(
-                              bottomRight: isUser ? const Radius.circular(2) : const Radius.circular(16),
-                              bottomLeft: !isUser ? const Radius.circular(2) : const Radius.circular(16),
+                            borderRadius: BorderRadius.circular(14).copyWith(
+                              bottomRight: isUser ? const Radius.circular(2) : const Radius.circular(14),
+                              bottomLeft: !isUser ? const Radius.circular(2) : const Radius.circular(14),
                             ),
                             border: isUser ? null : Border.all(color: const Color(0xFFE2E8F0)),
                             boxShadow: [
@@ -294,10 +288,10 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
                                     children: [
                                       Text(
                                         act['label'] ?? '',
-                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
                                       ),
                                       const SizedBox(width: 4),
-                                      const Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF3B82F6)),
+                                      const Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF64748B)),
                                     ],
                                   ),
                                 ),
@@ -319,9 +313,9 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
               color: const Color(0xFFF8FAFC),
               child: Row(
                 children: const [
-                  PulsingDot(color: Color(0xFF3B82F6), size: 6),
+                  PulsingDot(color: Color(0xFF64748B), size: 5),
                   SizedBox(width: 8),
-                  Text('Agentic AI querying workshop data...', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                  Text('Searching workshop records...', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
                 ],
               ),
             ),
@@ -346,7 +340,7 @@ class _AgenticAIChatbotSheetState extends State<AgenticAIChatbotSheet> {
                     child: TextField(
                       controller: _inputController,
                       decoration: const InputDecoration(
-                        hintText: 'Ask AI (e.g. Bay status, Overdue cars)...',
+                        hintText: 'Ask assistant (e.g. Bay status, Overdue vehicles)...',
                         hintStyle: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
                         border: InputBorder.none,
                         isDense: true,
