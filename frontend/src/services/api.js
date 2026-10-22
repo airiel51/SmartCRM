@@ -415,13 +415,47 @@ export const api = {
   getSupabaseHealth: () => fetchWithFallback(`/supabase/health`),
   getSupabaseSchemaSql: () => fetchWithFallback(`/supabase/schema-sql`),
 
-  // 10. AI Copilot
-  copilotChat: (query, customerId = null, vehicleId = null) =>
-    fetchWithFallback(`/agents/copilot-chat`, {
-      method: 'POST',
-      body: JSON.stringify({ query, context_customer_id: customerId, context_vehicle_id: vehicleId })
-    }),
-  auditCustomer: (customerId) => fetchWithFallback(`/agents/audit/${customerId}`, { method: 'POST' }),
-  auditAllCustomers: () => fetchWithFallback(`/agents/audit-all`, { method: 'POST' }),
-  executeAction: (data) => fetchWithFallback(`/agents/execute-action`, { method: 'POST', body: JSON.stringify(data) })
+  // 11. Appointments Schedule
+  getAppointments: (status = '', date = '') => {
+    let q = '?';
+    if (status) q += `status=${encodeURIComponent(status)}&`;
+    if (date) q += `date=${encodeURIComponent(date)}&`;
+    return fetchWithFallback(`/appointments${q}`);
+  },
+  createAppointment: (data) =>
+    fetchWithFallback(`/appointments`, { method: 'POST', body: JSON.stringify(data) }),
+  updateAppointmentStatus: (id, newStatus) =>
+    fetchWithFallback(`/appointments/${id}/status?new_status=${encodeURIComponent(newStatus)}`, { method: 'PATCH' }),
+
+  // 12. Inquiries & Leads Inbox
+  getInquiries: (status = '') => {
+    let q = status ? `?status=${encodeURIComponent(status)}` : '';
+    return fetchWithFallback(`/inquiries${q}`);
+  },
+  createInquiry: (data) =>
+    fetchWithFallback(`/inquiries`, { method: 'POST', body: JSON.stringify(data) }),
+  convertInquiry: (id, data) =>
+    fetchWithFallback(`/inquiries/${id}/convert`, { method: 'POST', body: JSON.stringify(data) }),
+
+  // 13. Service Reminders
+  getReminders: (status = '') => {
+    let q = status ? `?status=${encodeURIComponent(status)}` : '';
+    return fetchWithFallback(`/reminders${q}`);
+  },
+  sendReminderWhatsApp: (id, phone, message) =>
+    fetchWithFallback(`/reminders/${id}/send-whatsapp?phone=${encodeURIComponent(phone)}&message=${encodeURIComponent(message)}`, { method: 'POST' }),
+
+  // 14. AI Workshop Recommendations
+  getAIRecommendations: (category = '', status = '') => {
+    let q = '?';
+    if (category) q += `category=${encodeURIComponent(category)}&`;
+    if (status) q += `status=${encodeURIComponent(status)}&`;
+    return fetchWithFallback(`/recommendations${q}`);
+  },
+  updateRecommendationStatus: (id, status) =>
+    fetchWithFallback(`/recommendations/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    })
 };
+

@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useToast } from './Toast';
 
-export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onSelectCustomer }) {
+export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, globalSearch, searchQuery, onSelectCustomer }) {
+  const { showToast } = useToast();
   const [customers, setCustomers] = useState([]);
   const [selectedCust, setSelectedCust] = useState(null);
   const [custDetails, setCustDetails] = useState(null);
   const [filterRisk, setFilterRisk] = useState('');
   const [auditMessage, setAuditMessage] = useState('');
 
+  const handleOpenIntake = onAddCustomer || onOpenNewCustomer;
+  const searchTerm = globalSearch || searchQuery || '';
+
   useEffect(() => {
     loadCustomers();
-  }, [globalSearch, filterRisk]);
+  }, [searchTerm, filterRisk]);
 
   const loadCustomers = async () => {
     try {
-      const data = await api.getCustomers(globalSearch, '', filterRisk);
+      const data = await api.getCustomers(searchTerm, '', filterRisk);
       if (Array.isArray(data)) setCustomers(data);
     } catch (e) {
       console.error(e);
+      showToast('error', 'Failed to load customer directory.');
     }
   };
 
@@ -52,10 +58,13 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
     setAuditMessage('Running LangGraph audit...');
     try {
       const res = await api.auditCustomer(custId);
-      setAuditMessage(`✓ Churn Risk: ${res.churn_risk_level} (${(res.churn_probability * 100).toFixed(1)}%). Health: ${res.health_score}/100.`);
+      const msg = `✓ Churn Risk: ${res.churn_risk_level} (${(res.churn_probability * 100).toFixed(1)}%). Health: ${res.health_score}/100.`;
+      setAuditMessage(msg);
+      showToast('success', msg);
       loadCustomers();
     } catch (e) {
       setAuditMessage('Audit finished (local simulation).');
+      showToast('info', 'Customer audit finished.');
     }
   };
 
@@ -68,7 +77,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
         <div className="metric-card-pastel lilac">
           <div className="metric-card-header">
             <span className="metric-card-title">Registered Fleet</span>
-            <button className="check-pill-btn" onClick={loadCustomers}>Check</button>
+            <button className="check-pill-btn" onClick={() => { loadCustomers(); showToast('info', 'Refreshing fleet directory...'); }}>Check</button>
           </div>
           <div className="metric-card-value">{customers.length || 186} Active</div>
         </div>
@@ -76,7 +85,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
         <div className="metric-card-pastel blue">
           <div className="metric-card-header">
             <span className="metric-card-title">Fleet Health Avg</span>
-            <button className="check-pill-btn">Check</button>
+            <button className="check-pill-btn" onClick={() => showToast('info', 'Average fleet maintenance index is 86.4% healthy.')}>Check</button>
           </div>
           <div className="metric-card-value">86.4% Good</div>
         </div>
@@ -84,12 +93,12 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
         <div className="metric-card-pastel honey">
           <div className="metric-card-header">
             <span className="metric-card-title">Churn Risk Interventions</span>
-            <button className="check-pill-btn" onClick={() => setFilterRisk('High')}>Check</button>
+            <button className="check-pill-btn" onClick={() => { setFilterRisk('High'); showToast('warning', `Filtering to ${highRiskCount} overdue accounts.`); }}>Check</button>
           </div>
           <div className="metric-card-value">{highRiskCount || 18} Accounts</div>
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-dark)', letterSpacing: '-0.02em' }}>
@@ -104,7 +113,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <select
             className="form-select"
             style={{ width: 180, fontSize: '0.8rem', padding: '6px 12px' }}
@@ -117,7 +126,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
             <option value="High">High Risk (Overdue)</option>
           </select>
 
-          <button className="btn btn-primary btn-sm" onClick={onOpenNewCustomer}>
+          <button className="btn btn-primary btn-sm" onClick={() => handleOpenIntake && handleOpenIntake()}>
             <span>+ Intake Vehicle</span>
           </button>
         </div>
@@ -125,9 +134,10 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
 
       {/* Accounts & Vehicles Table */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="interactions-table">
-          <thead>
-            <tr>
+        <div className="table-responsive">
+          <table className="interactions-table">
+            <thead>
+              <tr>
               <th>Vehicle Owner / Contact</th>
               <th>Registered Vehicles</th>
               <th>Health Score</th>
@@ -137,43 +147,84 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
             </tr>
           </thead>
           <tbody>
-            {customers.map((c) => (
-              <tr
-                key={c.id}
-                onClick={() => handleSelect(c)}
-                style={{ cursor: 'pointer' }}
-              >
-                <td>
-                  <div style={{ fontWeight: 700, color: 'var(--text-dark)', fontSize: '0.92rem' }}>
-                    {c.full_name || c.name}
-                  </div>
-                  <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                    📞 {c.phone} {c.email ? `• ${c.email}` : ''}
-                  </div>
+            {loading ? (
+              [1, 2, 3, 4, 5].map((n) => (
+                <tr key={n}>
+                  <td>
+                    <div className="skeleton-line md" style={{ margin: '0 0 4px 0' }} />
+                    <div className="skeleton-line sm" style={{ margin: 0 }} />
+                  </td>
+                  <td><div className="skeleton-line sm" style={{ width: 120, height: 22, borderRadius: 5, margin: 0 }} /></td>
+                  <td><div className="skeleton-line xs" style={{ width: 50, height: 22, borderRadius: 12, margin: 0 }} /></td>
+                  <td><div className="skeleton-line xs" style={{ width: 65, height: 20, borderRadius: 12, margin: 0 }} /></td>
+                  <td><div className="skeleton-line sm" style={{ width: 70, margin: 0 }} /></td>
+                  <td style={{ textAlign: 'right' }}><div className="skeleton-line sm" style={{ width: 85, height: 28, borderRadius: 6, margin: '0 0 0 auto' }} /></td>
+                </tr>
+              ))
+            ) : customers.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                  No customer profiles found. Click "+ Intake Vehicle" to register one.
                 </td>
+              </tr>
+            ) : (
+              customers.map((c) => (
+                <tr
+                  key={c.id}
+                  onClick={() => handleSelect(c)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td>
+                    <div style={{ fontWeight: 700, color: 'var(--text-dark)', fontSize: '0.92rem' }}>
+                      {c.full_name || c.name}
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 3 }}>
+                      <a
+                        href={`tel:${c.phone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="clickable-contact"
+                        title="Call Customer"
+                      >
+                        📞 {c.phone}
+                      </a>
+                      {c.email && (
+                        <>
+                          {' • '}
+                          <a
+                            href={`mailto:${c.email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="clickable-contact"
+                            title="Email Customer"
+                          >
+                            ✉️ {c.email}
+                          </a>
+                        </>
+                      )}
+                    </div>
+                  </td>
 
-                <td>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {c.vehicles && c.vehicles.length > 0 ? (
-                      c.vehicles.map((v, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span className="badge-plate">
-                            {v.plate_number}
-                          </span>
-                          <span style={{
-                            fontSize: '0.72rem',
-                            color: v.maintenance_status === 'Overdue' ? '#ef4444' : (v.maintenance_status === 'Due Soon' ? '#f59e0b' : '#10b981'),
-                            fontWeight: 700
-                          }}>
-                            • {v.make} {v.model}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{c.company || 'Private Owner'}</span>
-                    )}
-                  </div>
-                </td>
+                  <td>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {c.vehicles && c.vehicles.length > 0 ? (
+                        c.vehicles.map((v, idx) => (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span className="plate-mono-tag" style={{ fontSize: '0.7rem', padding: '2px 6px' }}>
+                              {v.plate_number}
+                            </span>
+                            <span style={{
+                              fontSize: '0.74rem',
+                              color: v.maintenance_status === 'Overdue' ? 'var(--semantic-danger-text)' : (v.maintenance_status === 'Due Soon' ? 'var(--semantic-warning-text)' : 'var(--semantic-success-text)'),
+                              fontWeight: 600
+                            }}>
+                              • {v.make} {v.model}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{c.company || 'Private Owner'}</span>
+                      )}
+                    </div>
+                  </td>
 
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -219,9 +270,11 @@ export default function CustomerDirectory({ onOpenNewCustomer, globalSearch, onS
                   </button>
                 </td>
               </tr>
-            ))}
-          </tbody>
+            ))
+          )}
+        </tbody>
         </table>
+        </div>
       </div>
 
       {/* 360° Drawer Modal */}

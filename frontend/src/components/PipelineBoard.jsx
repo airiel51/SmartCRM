@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useToast } from './Toast';
 
 const STAGES = [
   { id: 'Inquiry', label: '1. Inquiries & Quotes', color: '#8b5cf6', bayDefault: 'Bay 1' },
@@ -10,9 +11,12 @@ const STAGES = [
   { id: 'Invoiced', label: '6. Invoiced & Closed', color: '#64748b', bayDefault: 'Bay 4' }
 ];
 
-export default function PipelineBoard({ onOpenNewDeal, onSelectCustomer }) {
+export default function PipelineBoard({ onOpenNewDeal, onOpenServiceModal, onSelectCustomer }) {
+  const { showToast } = useToast();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleOpenModal = onOpenServiceModal || onOpenNewDeal;
 
   useEffect(() => {
     loadServices();
@@ -24,17 +28,22 @@ export default function PipelineBoard({ onOpenNewDeal, onSelectCustomer }) {
       if (Array.isArray(data)) setServices(data);
     } catch (e) {
       console.error(e);
+      showToast('error', 'Failed to refresh bay pipeline.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleMoveStage = async (recordId, newStage) => {
+    const prevStages = [...services];
     setServices(prev => prev.map(s => s.id === recordId ? { ...s, stage: newStage } : s));
     try {
       await api.updateServiceStage(recordId, newStage);
+      showToast('success', `Work order moved to ${newStage}`);
     } catch (e) {
       console.error('Failed to update stage on backend:', e);
+      setServices(prevStages);
+      showToast('error', `Failed to transition stage: ${e.message}`);
     }
   };
 
@@ -66,7 +75,7 @@ export default function PipelineBoard({ onOpenNewDeal, onSelectCustomer }) {
         <div className="metric-card-pastel lilac">
           <div className="metric-card-header">
             <span className="metric-card-title">Vehicles in Bays</span>
-            <button className="check-pill-btn" onClick={loadServices}>Check</button>
+            <button className="check-pill-btn" onClick={() => { loadServices(); showToast('info', 'Refreshing bay job orders...'); }}>Check</button>
           </div>
           <div className="metric-card-value">{activeBays} Active</div>
         </div>
@@ -74,7 +83,7 @@ export default function PipelineBoard({ onOpenNewDeal, onSelectCustomer }) {
         <div className="metric-card-pastel blue">
           <div className="metric-card-header">
             <span className="metric-card-title">QC Inspection Due</span>
-            <button className="check-pill-btn">Check</button>
+            <button className="check-pill-btn" onClick={() => showToast('info', `${qcReady} vehicles waiting for Quality Inspection checks.`)}>Check</button>
           </div>
           <div className="metric-card-value">{qcReady} Cars</div>
         </div>
@@ -82,14 +91,14 @@ export default function PipelineBoard({ onOpenNewDeal, onSelectCustomer }) {
         <div className="metric-card-pastel honey">
           <div className="metric-card-header">
             <span className="metric-card-title">Total Bay Pipeline</span>
-            <button className="check-pill-btn" onClick={onOpenNewDeal}>Check</button>
+            <button className="check-pill-btn" onClick={() => handleOpenModal && handleOpenModal()}>+ Order</button>
           </div>
           <div className="metric-card-value">RM {totalValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
         </div>
       </div>
 
       {/* Header Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-dark)', letterSpacing: '-0.02em' }}>
             Service Bays & Work Order Kanban
@@ -99,7 +108,7 @@ export default function PipelineBoard({ onOpenNewDeal, onSelectCustomer }) {
           </p>
         </div>
 
-        <button className="btn btn-primary btn-sm" onClick={onOpenNewDeal}>
+        <button className="btn btn-primary btn-sm" onClick={() => handleOpenModal && handleOpenModal()}>
           <span>+ Create Work Order</span>
         </button>
       </div>

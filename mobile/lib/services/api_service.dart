@@ -1,9 +1,17 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import '../models/models.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api/v1';
+  static String get baseUrl {
+    try {
+      if (Platform.isAndroid) {
+        return 'http://10.0.2.2:8000/api/v1';
+      }
+    } catch (_) {}
+    return 'http://127.0.0.1:8000/api/v1';
+  }
 
   // 1. Fetch Customers and multi-vehicle linking
   static Future<List<CustomerModel>> getCustomers() async {

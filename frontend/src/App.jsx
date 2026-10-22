@@ -1,190 +1,530 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
-import PipelineBoard from './components/PipelineBoard';
 import CustomerDirectory from './components/CustomerDirectory';
+import VehiclesView from './components/VehiclesView';
+import AppointmentsView from './components/AppointmentsView';
+import PipelineBoard from './components/PipelineBoard';
+import InquiriesView from './components/InquiriesView';
+import RemindersView from './components/RemindersView';
+import AnalyticsView from './components/AnalyticsView';
+import AIInsightsView from './components/AIInsightsView';
 import WhatsAppLiveHub from './components/WhatsAppLiveHub';
-import AgenticAISuite from './components/AgenticAISuite';
-import SupabaseSyncView from './components/SupabaseSyncView';
-import RightInspectorPanel from './components/RightInspectorPanel';
+import FAQView from './components/FAQView';
+import SettingsView from './components/SettingsView';
 import AgenticAIChatbotWidget from './components/AgenticAIChatbotWidget';
+import FloatingContactWidget from './components/FloatingContactWidget';
+import CookieBanner from './components/CookieBanner';
+import CommandPaletteModal from './components/CommandPaletteModal';
+import ConfirmModal from './components/ConfirmModal';
+import CopyButton from './components/CopyButton';
 import { AddCustomerModal, AddServiceModal } from './components/Modals';
+import { ToastProvider } from './components/Toast';
 
 const VIEW_TITLES = {
-  dashboard: 'Overview',
-  whatsapp: 'WhatsApp Messages',
-  pipeline: 'Service Bays',
-  customers: 'Customers & Vehicles',
-  supabase: 'Settings & Cloud Sync',
-  agentic_ai: 'Assistant'
+  overview: 'Workshop Overview',
+  dashboard: 'Workshop Overview',
+  customers: 'Customer & Vehicle Directory',
+  vehicles: 'Registered Vehicle Fleet',
+  appointments: 'Appointments & Scheduling',
+  pipeline: 'Service Jobs & Active Bays',
+  inquiries: 'Inquiries & Leads Queue',
+  reminders: 'Service Interval Reminders',
+  analytics: 'Analytics & Financials',
+  ai_insights: 'AI Strategic Recommendations',
+  whatsapp: 'WhatsApp Communications',
+  faq: 'Workshop FAQ & Policies',
+  settings: 'Workshop Settings & Staff Roles'
+};
+
+const VALID_VIEWS = Object.keys(VIEW_TITLES);
+
+const formatTimestamp = () => {
+  const d = new Date();
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
-  const [isInspectorOpen, setIsInspectorOpen] = useState(true);
+  const [currentView, setCurrentView] = useState('overview');
+  const [currentRole, setCurrentRole] = useState('owner'); // 'owner', 'pic', 'technician'
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(false);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
-  const [globalSearch, setGlobalSearch] = useState('');
+  const [isSearchPaletteOpen, setIsSearchPaletteOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
+  // Theme State (Dark Mode Toggle)
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('smartcrm-theme') ||
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  });
+
+  // Scroll Progress & Back-to-Top State
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const contentAreaRef = useRef(null);
+
+  // Dynamic Last Updated Timestamp
+  const [lastUpdated, setLastUpdated] = useState(formatTimestamp());
+
+  // UTM Attribution Tracking
+  const [utmData, setUtmData] = useState(null);
+
+  // Confirmation Modal State
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    variant: 'danger',
+    onConfirm: () => {}
+  });
+
+  // Apply data-theme to HTML root
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('smartcrm-theme', theme);
+  }, [theme]);
+
+  // Dynamic Page Titles for SEO & Browser Tabs
+  useEffect(() => {
+    const titleText = VIEW_TITLES[currentView] || 'Workshop';
+    document.title = `${titleText} — SmartCRM Apex AutoWorks`;
+  }, [currentView]);
+
+  // Ingest UTM Marketing Tracking from URL query params
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const source = params.get('utm_source');
+      const medium = params.get('utm_medium');
+      const campaign = params.get('utm_campaign');
+
+      if (source || medium || campaign) {
+        const data = {
+          source: source || 'direct',
+          medium: medium || 'referral',
+          campaign: campaign || 'workshop_2026'
+        };
+        setUtmData(data);
+        sessionStorage.setItem('smartcrm-utm', JSON.stringify(data));
+      } else {
+        const stored = sessionStorage.getItem('smartcrm-utm');
+        if (stored) {
+          setUtmData(JSON.parse(stored));
+        }
+      }
+    } catch (err) {
+      console.warn('UTM parsing warning:', err);
+    }
+  }, []);
+
+  // Scroll Progress listener on viewport container
+  const handleScroll = (e) => {
+    const target = e.target;
+    const totalHeight = target.scrollHeight - target.clientHeight;
+    if (totalHeight > 0) {
+      const progress = Math.min(100, Math.max(0, (target.scrollTop / totalHeight) * 100));
+      setScrollProgress(progress);
+    }
+    setShowBackToTop(target.scrollTop > 220);
+  };
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleNavigate = (view) => {
+    if (view === 'OPEN_SEARCH') {
+      setIsSearchPaletteOpen(true);
+      return;
+    }
+    setCurrentView(view);
+    setIsMobileMenuOpen(false);
+    // Scroll view back to top on navigation
+    if (contentAreaRef.current) {
+      contentAreaRef.current.scrollTop = 0;
+    }
+  };
+
+  const handleRefreshData = () => {
+    setLastUpdated(formatTimestamp());
+  };
+
   return (
-    <div className="dribbble-viewport">
-      <div className="dribbble-card-frame">
-        {/* 1. Slim Left Navigation Rail (#1c1e22) */}
+    <ToastProvider>
+      <div className="smartcrm-app-root">
+        {/* Skip to Content Accessibility Bypass Link */}
+        <a href="#smartcrm-main-content" className="skip-to-content">
+          Skip to main content
+        </a>
+
+        {/* Mobile Drawer Backdrop */}
+        {isMobileMenuOpen && (
+          <div
+            className="sidebar-mobile-backdrop"
+            onClick={() => setIsMobileMenuOpen(false)}
+            title="Close Navigation"
+          />
+        )}
+
+        {/* 1. Left SaaS Navigation Sidebar */}
         <Sidebar
           currentView={currentView}
-          setCurrentView={setCurrentView}
+          setCurrentView={handleNavigate}
+          currentRole={currentRole}
+          isMobileOpen={isMobileMenuOpen}
+          onCloseMobile={() => setIsMobileMenuOpen(false)}
         />
 
-        {/* 2. Unified Workspace Center Panel (100% UNIFORM ACROSS ALL VIEWS) */}
-        <div className="main-center-panel">
-          {/* Universal Header Row: "Hi, Airiel Hazim" + Live Module Pill + Search + Tools */}
-          <div className="center-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              <h1 className="greeting-text">Hi, Airiel Hazim</h1>
-              
-              {/* Dynamic View Pill Indicator with Pulsing Live Dot */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  background: '#f4f6fa',
-                  padding: '4px 10px',
-                  borderRadius: 9999,
-                  fontSize: '0.72rem',
-                  color: '#565d6d',
-                  fontWeight: 700,
-                  alignItems: 'center',
-                  gap: 6,
-                  border: '1px solid #edf0f5',
-                  whiteSpace: 'nowrap'
-                }}
-                title="Apex AutoWorks • SmartCRM"
+        {/* 2. Main Application Viewport */}
+        <main className="smartcrm-main-viewport">
+          {/* Top Horizontal Scroll Progress Bar */}
+          <div className="scroll-progress-bar-track">
+            <div
+              className="scroll-progress-bar"
+              style={{ width: `${scrollProgress}%` }}
+              role="progressbar"
+              aria-valuenow={Math.round(scrollProgress)}
+              aria-valuemin="0"
+              aria-valuemax="100"
+            />
+          </div>
+
+          {/* Universal SaaS Top Bar */}
+          <header className="smartcrm-topbar">
+            <div className="topbar-left">
+              {/* Mobile Hamburger Menu Toggle */}
+              <button
+                className="mobile-menu-toggle-btn"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle Navigation Menu"
+                title="Open Navigation Menu"
               >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
-                <span>Apex AutoWorks • {VIEW_TITLES[currentView] || 'Overview'}</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </button>
+
+              {/* Clickable Brand Breadcrumb */}
+              <div className="breadcrumb-trail">
+                <span
+                  className="breadcrumb-org clickable-org"
+                  onClick={() => handleNavigate('overview')}
+                  title="Return to Workshop Overview"
+                >
+                  Apex AutoWorks
+                </span>
+                <span className="breadcrumb-separator">/</span>
+                <span className="breadcrumb-current">{VIEW_TITLES[currentView] || 'Overview'}</span>
               </div>
+
+              <span className="live-status-pill" title="FastAPI and Supabase Realtime Active">
+                <span className="status-indicator-dot"></span>
+                FastAPI v1 • Online
+              </span>
+
+              {/* UTM Campaign Tracking Chip */}
+              {utmData && (
+                <div className="utm-tracking-pill" title={`UTM Source: ${utmData.source} | Medium: ${utmData.medium} | Campaign: ${utmData.campaign}`}>
+                  <span>🎯 {utmData.source}/{utmData.medium}</span>
+                  <CopyButton
+                    text={`utm_source=${utmData.source}&utm_medium=${utmData.medium}&utm_campaign=${utmData.campaign}`}
+                    title="Copy active UTM query string"
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Header Tools */}
-            <div className="center-header-tools">
-              <div className="search-pill">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <div className="topbar-right">
+              {/* Site Search & Command Palette Trigger */}
+              <div
+                className="topbar-search"
+                onClick={() => setIsSearchPaletteOpen(true)}
+                title="Global Search & Quick Actions (Press Ctrl+K)"
+                style={{ cursor: 'pointer' }}
+              >
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
                   type="text"
-                  placeholder="Search"
+                  placeholder="Search plates, bays, FAQ (Ctrl+K)..."
                   value={globalSearch}
                   onChange={(e) => setGlobalSearch(e.target.value)}
+                  readOnly
+                  style={{ cursor: 'pointer' }}
                 />
+                <kbd style={{ fontSize: '0.68rem', padding: '2px 5px', borderRadius: 4, background: 'var(--border-subtle)', border: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
+                  ⌘K
+                </kbd>
               </div>
 
-              {/* Context Action Button depending on view */}
-              {currentView === 'customers' && (
+              {/* Dynamic Last Updated Badge */}
+              <div className="last-updated-badge" title="Live telemetry sync timestamp">
+                <span className="last-updated-dot"></span>
+                <span>{lastUpdated}</span>
                 <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => setIsIntakeModalOpen(true)}
+                  type="button"
+                  className="refresh-sync-btn"
+                  onClick={handleRefreshData}
+                  title="Sync workshop telemetry"
+                  aria-label="Sync workshop telemetry"
                 >
-                  + Intake Vehicle
+                  ↻
                 </button>
-              )}
+              </div>
 
-              {currentView === 'pipeline' && (
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => setIsServiceModalOpen(true)}
-                >
-                  + Work Order
-                </button>
-              )}
+              {/* Dark Mode Toggle */}
+              <button
+                type="button"
+                className="theme-toggle-btn"
+                onClick={toggleTheme}
+                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+                aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+              >
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
 
+              {/* Quick Action Buttons */}
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => setIsIntakeModalOpen(true)}
+                title="Register a new customer vehicle"
+              >
+                + Intake Vehicle
+              </button>
               <button
                 className="btn btn-secondary btn-sm"
-                onClick={() => setIsCopilotOpen(true)}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
-                title="Workshop Assistant"
+                onClick={() => setIsServiceModalOpen(true)}
+                title="Create a new bay work order"
               >
-                <span>Assistant</span>
+                + Work Order
               </button>
 
-              <button
-                className="bell-btn"
-                title="Notifications"
-                onClick={() => alert('No unread notifications.')}
-              >
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="bell-dot" />
-              </button>
+              {/* Role Switcher Pill */}
+              <div className="role-selector-wrap">
+                <select
+                  className="role-select-dropdown"
+                  value={currentRole}
+                  onChange={(e) => setCurrentRole(e.target.value)}
+                  title="Simulate Role Permissions"
+                >
+                  <option value="owner">👑 Owner / Admin</option>
+                  <option value="pic">📋 PIC / Staff</option>
+                  <option value="technician">🔧 Technician</option>
+                </select>
+              </div>
             </div>
+          </header>
+
+          {/* Dynamic Route Workspace */}
+          <div
+            id="smartcrm-main-content"
+            className="smartcrm-content-area"
+            ref={contentAreaRef}
+            onScroll={handleScroll}
+            tabIndex="-1"
+          >
+            {(currentView === 'overview' || currentView === 'dashboard') && (
+              <Dashboard
+                onNavigateView={handleNavigate}
+                onSelectCustomer={setSelectedCustomer}
+              />
+            )}
+
+            {currentView === 'customers' && (
+              <CustomerDirectory
+                globalSearch={globalSearch}
+                searchQuery={globalSearch}
+                onSelectCustomer={setSelectedCustomer}
+                onOpenNewCustomer={() => setIsIntakeModalOpen(true)}
+                onAddCustomer={() => setIsIntakeModalOpen(true)}
+              />
+            )}
+
+            {currentView === 'vehicles' && (
+              <VehiclesView
+                onIntakeVehicle={() => setIsIntakeModalOpen(true)}
+              />
+            )}
+
+            {currentView === 'appointments' && (
+              <AppointmentsView
+                onOpenBookingModal={() => setIsServiceModalOpen(true)}
+              />
+            )}
+
+            {currentView === 'pipeline' && (
+              <PipelineBoard
+                onOpenNewDeal={() => setIsServiceModalOpen(true)}
+                onOpenServiceModal={() => setIsServiceModalOpen(true)}
+                onSelectCustomer={setSelectedCustomer}
+              />
+            )}
+
+            {currentView === 'inquiries' && (
+              <InquiriesView />
+            )}
+
+            {currentView === 'reminders' && (
+              <RemindersView
+                onScheduleService={() => setIsServiceModalOpen(true)}
+              />
+            )}
+
+            {currentView === 'analytics' && (
+              <AnalyticsView />
+            )}
+
+            {currentView === 'ai_insights' && (
+              <AIInsightsView />
+            )}
+
+            {currentView === 'whatsapp' && (
+              <WhatsAppLiveHub
+                onSelectCustomer={setSelectedCustomer}
+              />
+            )}
+
+            {currentView === 'faq' && (
+              <FAQView />
+            )}
+
+            {currentView === 'settings' && (
+              <SettingsView
+                currentRole={currentRole}
+                onChangeRole={setCurrentRole}
+              />
+            )}
+
+            {/* Custom 404 Fallback Page */}
+            {!VALID_VIEWS.includes(currentView) && (
+              <div className="view-container">
+                <div className="empty-state custom-404-card">
+                  <div style={{ fontSize: '3.2rem', marginBottom: 12 }}>🔧</div>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px 0' }}>
+                    404 — Workshop Page Not Found
+                  </h2>
+                  <p style={{ color: 'var(--text-muted)', maxWidth: 440, margin: '0 auto 20px auto', fontSize: '0.88rem', lineHeight: 1.55 }}>
+                    The requested workshop module <code>"{currentView}"</code> does not exist or may have been relocated.
+                  </p>
+                  <button className="btn btn-primary btn-sm" onClick={() => handleNavigate('overview')}>
+                    ← Return to Workshop Overview
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Active View Content */}
-          {currentView === 'dashboard' && (
-            <Dashboard
-              onSelectCustomer={setSelectedCustomer}
-              onNavigateView={setCurrentView}
-            />
+          {/* Floating Back to Top Button */}
+          {showBackToTop && (
+            <button
+              type="button"
+              className="back-to-top-btn animate-fade-in"
+              onClick={() => contentAreaRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+              title="Scroll back to top"
+              aria-label="Back to top"
+            >
+              ↑ Top
+            </button>
           )}
-          {currentView === 'whatsapp' && (
-            <WhatsAppLiveHub
-              onSelectCustomer={setSelectedCustomer}
-            />
-          )}
-          {currentView === 'pipeline' && (
-            <PipelineBoard
-              onOpenNewDeal={() => setIsServiceModalOpen(true)}
-              onSelectCustomer={setSelectedCustomer}
-            />
-          )}
-          {currentView === 'customers' && (
-            <CustomerDirectory
-              onOpenNewCustomer={() => setIsIntakeModalOpen(true)}
-              globalSearch={globalSearch}
-              onSelectCustomer={setSelectedCustomer}
-            />
-          )}
-          {currentView === 'agentic_ai' && (
-            <AgenticAISuite
-              onSelectCustomer={setSelectedCustomer}
-            />
-          )}
-          {currentView === 'supabase' && (
-            <SupabaseSyncView />
-          )}
-        </div>
 
-        {/* 3. Persistent Right Inspector Panel (Selected Customer / Diagnostic Voice Note Waveform) */}
-        <RightInspectorPanel
-          activeCustomer={selectedCustomer}
-          currentView={currentView}
-          isOpen={isInspectorOpen}
-          onToggle={() => setIsInspectorOpen(!isInspectorOpen)}
+          {/* Global Production Footer with Copyright & Clickable Contacts */}
+          <footer className="smartcrm-app-footer">
+            <div className="footer-left">
+              <span>© {new Date().getFullYear()} SmartCRM Workshop OS • Apex AutoWorks (Bayan Lepas, Penang) • All rights reserved.</span>
+            </div>
+            <div className="footer-right">
+              <a href="tel:+60123456789" className="footer-contact-link" title="Call Workshop Support">
+                📞 +60 12-345 6789
+              </a>
+              <span className="footer-sep">•</span>
+              <a href="mailto:support@apexautoworks.my" className="footer-contact-link" title="Email Workshop Desk">
+                ✉️ support@apexautoworks.my
+              </a>
+              <span className="footer-sep">•</span>
+              <button
+                type="button"
+                className="footer-contact-link"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', padding: 0 }}
+                onClick={() => handleNavigate('faq')}
+                title="Workshop Policies & FAQs"
+              >
+                FAQ & Warranties
+              </button>
+              <span className="footer-sep">•</span>
+              <a
+                href="http://127.0.0.1:8000/docs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-contact-link"
+                title="OpenAPI Backend Documentation"
+              >
+                API Docs
+              </a>
+            </div>
+          </footer>
+        </main>
+
+        {/* Floating Concierge & Quick Contact FAB Widget */}
+        <FloatingContactWidget />
+
+        {/* Floating Agentic AI Copilot Chatbot */}
+        <AgenticAIChatbotWidget onNavigateTab={handleNavigate} />
+
+        {/* GDPR / Malaysian PDPA Cookie Consent Banner */}
+        <CookieBanner />
+
+        {/* Global Command Palette / Site Search Modal (Ctrl+K) */}
+        <CommandPaletteModal
+          isOpen={isSearchPaletteOpen}
+          onClose={() => setIsSearchPaletteOpen(false)}
+          onNavigate={(view) => {
+            handleNavigate(view);
+            setIsSearchPaletteOpen(false);
+          }}
+          onTriggerAction={(action) => {
+            setIsSearchPaletteOpen(false);
+            if (action === 'intake') setIsIntakeModalOpen(true);
+            if (action === 'service') setIsServiceModalOpen(true);
+          }}
         />
+
+        {/* Action Confirmation Modal */}
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          confirmText={confirmModal.confirmText}
+          cancelText={confirmModal.cancelText}
+          confirmVariant={confirmModal.variant}
+          onConfirm={() => {
+            if (confirmModal.onConfirm) confirmModal.onConfirm();
+            setConfirmModal(prev => ({ ...prev, isOpen: false }));
+          }}
+          onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        />
+
+        {/* Global Modals */}
+        {isIntakeModalOpen && (
+          <AddCustomerModal
+            isOpen={isIntakeModalOpen}
+            onClose={() => setIsIntakeModalOpen(false)}
+          />
+        )}
+
+        {isServiceModalOpen && (
+          <AddServiceModal
+            isOpen={isServiceModalOpen}
+            onClose={() => setIsServiceModalOpen(false)}
+          />
+        )}
       </div>
-
-      {/* Omnipresent Agentic AI Chatbot Widget (Appears on EVERY page) */}
-      <AgenticAIChatbotWidget
-        isOpen={isCopilotOpen}
-        onToggle={() => setIsCopilotOpen(!isCopilotOpen)}
-        currentView={currentView}
-        selectedCustomer={selectedCustomer}
-        onNavigateView={setCurrentView}
-        onSelectCustomer={setSelectedCustomer}
-      />
-
-      {/* Modals */}
-      <AddCustomerModal
-        isOpen={isIntakeModalOpen}
-        onClose={() => setIsIntakeModalOpen(false)}
-      />
-
-      <AddServiceModal
-        isOpen={isServiceModalOpen}
-        onClose={() => setIsServiceModalOpen(false)}
-      />
-    </div>
+    </ToastProvider>
   );
 }

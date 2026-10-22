@@ -3,6 +3,10 @@
 *Author: Airiel Hazim Bin Redzuan Ng (Universiti Sains Malaysia)*  
 *Supervisor: Dr. Mohd Nadhir Ab Wahab*
 
+🚀 **Live Web Application (GitHub Pages):** [https://airiel51.github.io/SmartCRM/](https://airiel51.github.io/SmartCRM/)  
+📦 **GitHub Repository:** [https://github.com/airiel51/SmartCRM](https://github.com/airiel51/SmartCRM)  
+🌐 **Repository Description Link:** `https://airiel51.github.io/SmartCRM/`
+
 SmartCRM is an intelligent, domain-specific Customer Relationship Management system designed specifically for **automotive repair workshops and service centres**. It resolves manual record-keeping failures, reactive retention drift, and fragmented communication channels by uniting:
 1. **Pillar 1: Cross-Platform Web (React) & Mobile Shop-Floor Interface**
 2. **Pillar 2: Supabase-Managed PostgreSQL Database** (multi-vehicle linking, RLS, real-time sync)
@@ -187,3 +191,47 @@ Run `python backend/verify_backend.py` to validate all modules end-to-end:
   [SUCCESS] ALL SMARTCRM BACKEND & SUPABASE TESTS PASSED FLAWLESSLY!   
 ======================================================================
 ```
+
+---
+
+## 5. Production Feature Enhancement Suite (20 Key Checklist Items)
+
+The web application includes comprehensive production-grade enhancements:
+
+| # | Feature | Implementation Details |
+|---|---|---|
+| 1 | **Dark Mode Toggle** | State-persisted (`localStorage`) dark mode toggle (`☀️ / 🌙`) with high-contrast slate-900 canvas, executive palette, and smooth CSS transitions. |
+| 2 | **Simple Cookie Banner** | GDPR & Malaysian PDPA (2010) compliance consent banner with `Accept All` and `Essential Only` options. |
+| 3 | **Site Search (Command Palette)** | Global `Ctrl+K` / `Cmd+K` command palette indexing all workshop modules, vehicle plates, customers, and quick action shortcuts. |
+| 4 | **Top Button (Back to Top)** | Dynamic floating button that smoothly scrolls users back to top when viewport scroll offset exceeds 220px. |
+| 5 | **Mobile Menus** | Responsive drawer navigation with hamburger toggle button and backdrop dismiss. |
+| 6 | **Loading Animations** | Skeleton loaders, pulse indicators, and shimmer animations across dashboards and Kanban cards. |
+| 7 | **Hover States** | Micro-interactions, button hover states, card elevation shifts, and interactive data row highlights. |
+| 8 | **Scroll Progress Bars** | Linear gradient reading/scroll depth progress bar at the top edge of the main viewport. |
+| 9 | **Copy Button** | 1-click clipboard copy utility with micro-animation and "Copied! ✓" visual feedback for plates, contacts, and UTMs. |
+| 10 | **Print Stylesheet** | Dedicated `@media print` stylesheet for clean work order printing and estimate invoices. |
+| 11 | **Sticky Headers** | Sticky topbar and sticky table headers (`position: sticky; top: 0`) for effortless shop-floor browsing. |
+| 12 | **Skip to Content** | Accessibility bypass link (`#smartcrm-main-content`) revealed on keyboard `Tab` focus. |
+| 13 | **Password Visibility Toggle** | Interactive eye toggle (`Show / Hide`) for API tokens, secret keys, and passwords. |
+| 14 | **UTM Tracking** | URL parameter ingestion (`utm_source`, `utm_medium`, `utm_campaign`) persisted in `sessionStorage` with topbar attribution chip. |
+| 15 | **Form Success State** | Explicit inline green check indicators and success feedback upon valid field input. |
+| 16 | **Form Error State** | Explicit inline red border highlights and descriptive validation feedback messages. |
+| 17 | **Confirmation Modals** | Reusable `ConfirmModal` for destructive actions, intake cancellations, and reset telemetry. |
+| 18 | **Last Updated Date** | Dynamic timestamp badge displaying real-time synchronization state with refresh trigger. |
+| 19 | **Expandable FAQ** | Interactive accordion FAQ covering Malaysian workshop warranties, oil grades (0W-20, 5W-30), and PUSPAKOM inspections. |
+| 20 | **Floating Contact** | Floating concierge FAB with direct WhatsApp desk link, phone hotline, and 24/7 SOS towing hotline. |
+
+---
+
+## 6. GitHub Pages Deployment Instructions
+
+To view the live application:
+- **Live URL:** [https://airiel51.github.io/SmartCRM/](https://airiel51.github.io/SmartCRM/)
+- **Repository Link:** [https://github.com/airiel51/SmartCRM](https://github.com/airiel51/SmartCRM)
+
+To configure the live link in the GitHub repository description:
+1. Navigate to [https://github.com/airiel51/SmartCRM](https://github.com/airiel51/SmartCRM).
+2. Click the ⚙️ gear icon next to the **About** section on the right side of the repository page.
+3. In the **Website** field, enter: `https://airiel51.github.io/SmartCRM/`
+4. In the **Description** field, enter: `SmartCRM — Intelligent Automotive Workshop OS with Agentic AI, WhatsApp Hub & Telemetry Analytics (Live: https://airiel51.github.io/SmartCRM/)`
+5. Click **Save changes**.

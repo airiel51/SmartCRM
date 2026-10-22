@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useToast } from './Toast';
 
 export function AddCustomerModal({ isOpen, onClose, onCreated }) {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '+60 ',
@@ -22,7 +24,9 @@ export function AddCustomerModal({ isOpen, onClose, onCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.full_name.trim() || !formData.phone.trim() || !formData.vehicle_plate.trim()) {
-      setError('Please provide Customer Name, Phone Number, and Vehicle Plate Number.');
+      const msg = 'Please provide Customer Name, Phone Number, and Vehicle Plate Number.';
+      setError(msg);
+      showToast('warning', msg);
       return;
     }
     setLoading(true);
@@ -30,10 +34,13 @@ export function AddCustomerModal({ isOpen, onClose, onCreated }) {
 
     try {
       await api.createCustomer(formData);
+      showToast('success', `Customer ${formData.full_name} (${formData.vehicle_plate}) enrolled successfully!`);
       if (onCreated) onCreated();
       onClose();
     } catch (err) {
-      setError(err.message || 'Failed to register vehicle intake.');
+      const msg = err.message || 'Failed to register vehicle intake.';
+      setError(msg);
+      showToast('error', msg);
     } finally {
       setLoading(false);
     }
@@ -189,6 +196,7 @@ export function AddCustomerModal({ isOpen, onClose, onCreated }) {
 }
 
 export function AddServiceModal({ isOpen, onClose, onCreated }) {
+  const { showToast } = useToast();
   const [customers, setCustomers] = useState([]);
   const [formData, setFormData] = useState({
     customer_id: '',
@@ -201,9 +209,11 @@ export function AddServiceModal({ isOpen, onClose, onCreated }) {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
+      setError('');
       api.getCustomers().then(data => {
         if (Array.isArray(data) && data.length > 0) {
           setCustomers(data);
@@ -231,14 +241,22 @@ export function AddServiceModal({ isOpen, onClose, onCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.customer_id) {
+      setError('Please select a customer for this work order.');
+      showToast('warning', 'Please select a customer.');
+      return;
+    }
     setLoading(true);
+    setError('');
     try {
       await api.createService(formData);
+      showToast('success', `Work order created for ${formData.service_bay} (${formData.service_type})!`);
       if (onCreated) onCreated();
       onClose();
     } catch (err) {
-      console.error(err);
-      onClose();
+      const msg = err.message || 'Failed to dispatch work order.';
+      setError(msg);
+      showToast('error', msg);
     } finally {
       setLoading(false);
     }
@@ -258,6 +276,12 @@ export function AddServiceModal({ isOpen, onClose, onCreated }) {
           </div>
           <button className="btn-close" onClick={onClose}>✕</button>
         </div>
+
+        {error && (
+          <div style={{ padding: '10px 14px', background: 'var(--semantic-danger-bg)', color: 'var(--semantic-danger-text)', border: '1px solid var(--semantic-danger-border)', borderRadius: 10, fontSize: '0.82rem', marginBottom: 14, fontWeight: 600 }}>
+            ⚠ {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
