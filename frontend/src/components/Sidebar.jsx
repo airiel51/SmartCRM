@@ -1,6 +1,14 @@
 import React from 'react';
 
-export default function Sidebar({ currentView, setCurrentView, currentRole = 'owner', isMobileOpen = false, onCloseMobile }) {
+export default function Sidebar({
+  currentView,
+  setCurrentView,
+  currentRole = 'owner',
+  isMobileOpen = false,
+  isMenuHidden = false,
+  onToggleHide,
+  onCloseMobile
+}) {
   const navSections = [
     {
       title: 'OPERATIONS',
@@ -138,7 +146,7 @@ export default function Sidebar({ currentView, setCurrentView, currentRole = 'ow
   ];
 
   return (
-    <aside className={`app-sidebar ${isMobileOpen ? 'mobile-drawer-open' : ''}`}>
+    <aside className={`app-sidebar ${isMobileOpen ? 'mobile-drawer-open' : ''} ${isMenuHidden ? 'sidebar-hidden' : ''}`}>
       {/* Brand Header with Clickable Logo & Mobile Close */}
       <div className="sidebar-brand-row">
         <div
@@ -161,6 +169,23 @@ export default function Sidebar({ currentView, setCurrentView, currentRole = 'ow
             <span className="brand-sub">Apex AutoWorks • Bayan Lepas</span>
           </div>
         </div>
+
+        {/* Desktop Collapse / Hide Button */}
+        {onToggleHide && (
+          <button
+            type="button"
+            className="sidebar-collapse-btn desktop-only"
+            onClick={onToggleHide}
+            aria-label="Hide Sidebar Menu (Ctrl+B)"
+            title="Hide Menu (Ctrl+B)"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <polyline points="15 9 12 12 15 15"></polyline>
+            </svg>
+          </button>
+        )}
 
         {/* Mobile Close Button */}
         {onCloseMobile && (
@@ -210,6 +235,27 @@ export default function Sidebar({ currentView, setCurrentView, currentRole = 'ow
           </div>
         ))}
       </div>
+
+      {/* Hide Menu Action in Sidebar Footer */}
+      {onToggleHide && (
+        <div className="sidebar-collapse-footer-row desktop-only">
+          <button
+            type="button"
+            className="sidebar-collapse-footer-btn"
+            onClick={onToggleHide}
+            title="Hide Sidebar Menu (Ctrl+B)"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="11 17 6 12 11 7"></polyline>
+                <polyline points="18 17 13 12 18 7"></polyline>
+              </svg>
+              <span>Hide Menu</span>
+            </div>
+            <kbd className="sidebar-kbd-hint">Ctrl+B</kbd>
+          </button>
+        </div>
+      )}
 
       {/* Sidebar Footer */}
       <div className="sidebar-footer">

@@ -25,7 +25,8 @@ const SEARCHABLE_ITEMS = [
 
   // Action Shortcuts
   { id: 'a1', title: '+ Intake New Vehicle Profile', type: 'ACTION', subtitle: 'Enroll vehicle specs, plate, and odometer', action: 'intake' },
-  { id: 'a2', title: '+ Dispatch Work Order to Bay', type: 'ACTION', subtitle: 'Assign customer to shop floor bay with estimate', action: 'service' }
+  { id: 'a2', title: '+ Dispatch Work Order to Bay', type: 'ACTION', subtitle: 'Assign customer to shop floor bay with estimate', action: 'service' },
+  { id: 'a3', title: 'Toggle Sidebar Menu (Show / Hide)', type: 'ACTION', subtitle: 'Collapse or expand left navigation menu (Ctrl+B)', action: 'toggle_menu' }
 ];
 
 export default function CommandPaletteModal({ isOpen, onClose, onNavigate, onTriggerAction }) {
