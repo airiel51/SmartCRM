@@ -5,6 +5,7 @@ import { useToast } from './Toast';
 export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, globalSearch, searchQuery, onSelectCustomer }) {
   const { showToast } = useToast();
   const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCust, setSelectedCust] = useState(null);
   const [custDetails, setCustDetails] = useState(null);
   const [filterRisk, setFilterRisk] = useState('');
@@ -18,12 +19,15 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
   }, [searchTerm, filterRisk]);
 
   const loadCustomers = async () => {
+    setLoading(true);
     try {
       const data = await api.getCustomers(searchTerm, '', filterRisk);
       if (Array.isArray(data)) setCustomers(data);
     } catch (e) {
       console.error(e);
       showToast('error', 'Failed to load customer directory.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,7 +72,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
     }
   };
 
-  const highRiskCount = customers.filter(c => c.churn_risk === 'High').length;
+  const highRiskCount = (customers || []).filter(c => c && c.churn_risk === 'High').length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
