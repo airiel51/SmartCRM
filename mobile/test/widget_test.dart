@@ -13,7 +13,7 @@ import 'package:smartcrm_mobile/main.dart';
 void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const SmartCRMApp());
+    await tester.pumpWidget(const ApexAutoWorksApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
