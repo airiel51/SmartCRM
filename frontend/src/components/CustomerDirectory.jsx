@@ -236,25 +236,25 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
                       width: 32,
                       height: 32,
                       borderRadius: '50%',
-                      background: c.health_score >= 80 ? 'var(--pastel-emerald)' : (c.health_score >= 50 ? 'var(--pastel-honey)' : 'var(--pastel-rose)'),
-                      color: c.health_score >= 80 ? 'var(--pastel-emerald-text)' : (c.health_score >= 50 ? 'var(--pastel-honey-text)' : 'var(--pastel-rose-text)'),
+                      background: (Number(c.health_score) || 85) >= 80 ? 'var(--pastel-emerald)' : ((Number(c.health_score) || 85) >= 50 ? 'var(--pastel-honey)' : 'var(--pastel-rose)'),
+                      color: (Number(c.health_score) || 85) >= 80 ? 'var(--pastel-emerald-text)' : ((Number(c.health_score) || 85) >= 50 ? 'var(--pastel-honey-text)' : 'var(--pastel-rose-text)'),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontWeight: 800,
                       fontSize: '0.78rem'
                     }}>
-                      {c.health_score}
+                      {c.health_score ?? 85}
                     </div>
                     <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                      {c.health_score >= 80 ? 'Optimal' : (c.health_score >= 50 ? 'Warning' : 'Critical')}
+                      {(Number(c.health_score) || 85) >= 80 ? 'Optimal' : ((Number(c.health_score) || 85) >= 50 ? 'Warning' : 'Critical')}
                     </div>
                   </div>
                 </td>
 
                 <td>
-                  <span className={`badge badge-${(c.churn_risk || 'low').toLowerCase()}`}>
-                    {c.churn_risk} Risk
+                  <span className={`badge badge-${String(c.churn_risk || 'low').toLowerCase()}`}>
+                    {c.churn_risk || 'Low'} Risk
                   </span>
                 </td>
 

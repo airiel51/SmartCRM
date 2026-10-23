@@ -311,7 +311,270 @@ const MOCK_FALLBACK = {
     win_rate_percentage: 78.4,
     at_risk_arr: 8500.0,
     pending_activities_count: 3
-  }
+  },
+  vehicles: [
+    {
+      id: "v-1",
+      plate_number: "WXY 8821",
+      make: "Perodua",
+      model: "Myvi 1.5 AV",
+      year: 2021,
+      current_mileage: 58400,
+      maintenance_status: "Overdue",
+      next_service_due_date: "2026-09-18T00:00:00",
+      next_service_due_mileage: 55000,
+      customer_id: "c-1",
+      customer_name: "Ahmad Razali",
+      customer_phone: "+60 12-345 6789"
+    },
+    {
+      id: "v-2",
+      plate_number: "PNG 4419",
+      make: "Honda",
+      model: "Civic RS 1.5 Turbo",
+      year: 2022,
+      current_mileage: 38200,
+      maintenance_status: "On Track",
+      next_service_due_date: "2027-03-01T00:00:00",
+      next_service_due_mileage: 45000,
+      customer_id: "c-2",
+      customer_name: "Tan Wei Ming",
+      customer_phone: "+60 17-882 1902"
+    },
+    {
+      id: "v-3",
+      plate_number: "VAB 2020",
+      make: "Proton",
+      model: "X50 1.5 TGDi",
+      year: 2021,
+      current_mileage: 41800,
+      maintenance_status: "Due Soon",
+      next_service_due_date: "2026-10-28T00:00:00",
+      next_service_due_mileage: 42000,
+      customer_id: "c-3",
+      customer_name: "Priya Subramaniam",
+      customer_phone: "+60 16-554 2190"
+    },
+    {
+      id: "v-4",
+      plate_number: "JRS 7731",
+      make: "Toyota",
+      model: "Vios 1.5G",
+      year: 2020,
+      current_mileage: 72100,
+      maintenance_status: "On Track",
+      next_service_due_date: "2027-01-15T00:00:00",
+      next_service_due_mileage: 80000,
+      customer_id: "c-4",
+      customer_name: "Michael Wong",
+      customer_phone: "+60 19-411 9832"
+    },
+    {
+      id: "v-5",
+      plate_number: "KV 5502",
+      make: "Perodua",
+      model: "Bezza 1.3X",
+      year: 2019,
+      current_mileage: 94300,
+      maintenance_status: "Due Soon",
+      next_service_due_date: "2026-11-05T00:00:00",
+      next_service_due_mileage: 95000,
+      customer_id: "c-5",
+      customer_name: "Nurul Huda",
+      customer_phone: "+60 11-399 4410"
+    },
+    {
+      id: "v-6",
+      plate_number: "BQP 9912",
+      make: "BMW",
+      model: "320i M Sport",
+      year: 2022,
+      current_mileage: 32400,
+      maintenance_status: "On Track",
+      next_service_due_date: "2027-04-10T00:00:00",
+      next_service_due_mileage: 40000,
+      customer_id: "c-6",
+      customer_name: "David Lim",
+      customer_phone: "+60 12-661 8820"
+    }
+  ],
+  appointments: [
+    {
+      id: "app-1",
+      customer_id: "c-2",
+      customer_name: "Tan Wei Ming",
+      customer_phone: "+60 17-882 1902",
+      vehicle_id: "v-2",
+      vehicle_plate: "PNG 4419",
+      vehicle_model: "Honda Civic RS 1.5 Turbo",
+      service_type: "Full Synthetic Engine Oil Service",
+      scheduled_date: new Date(Date.now() + 86400000).toISOString(),
+      status: "confirmed",
+      service_bay: "Bay 1 (Engine)",
+      notes: "Customer requesting Liqui Moly 5W-30 synthetic oil."
+    },
+    {
+      id: "app-2",
+      customer_id: "c-3",
+      customer_name: "Priya Subramaniam",
+      customer_phone: "+60 16-554 2190",
+      vehicle_id: "v-3",
+      vehicle_plate: "VAB 2020",
+      vehicle_model: "Proton X50 1.5 TGDi",
+      service_type: "Brake Pad & Rotor Inspection",
+      scheduled_date: new Date(Date.now() + 172800000).toISOString(),
+      status: "scheduled",
+      service_bay: "Bay 2 (Brakes)",
+      notes: "Squeaking sound reported under deceleration."
+    },
+    {
+      id: "app-3",
+      customer_id: "c-4",
+      customer_name: "Michael Wong",
+      customer_phone: "+60 19-411 9832",
+      vehicle_id: "v-4",
+      vehicle_plate: "JRS 7731",
+      vehicle_model: "Toyota Vios 1.5G",
+      service_type: "Air Conditioning Flush & Regas",
+      scheduled_date: new Date(Date.now() + 259200000).toISOString(),
+      status: "scheduled",
+      service_bay: "Bay 3 (General)",
+      notes: "Air conditioning lukewarm at high midday heat."
+    },
+    {
+      id: "app-4",
+      customer_id: "c-6",
+      customer_name: "David Lim",
+      customer_phone: "+60 12-661 8820",
+      vehicle_id: "v-6",
+      vehicle_plate: "BQP 9912",
+      vehicle_model: "BMW 320i M Sport",
+      service_type: "Final Inspection & Diagnostic Scan",
+      scheduled_date: new Date().toISOString(),
+      status: "in_progress",
+      service_bay: "Bay 4 (QC)",
+      notes: "Quality check before client collection."
+    }
+  ],
+  reminders: [
+    {
+      id: "rem-1",
+      customer_id: "c-1",
+      customer_name: "Ahmad Razali",
+      customer_phone: "+60 12-345 6789",
+      vehicle_plate: "WXY 8821",
+      vehicle_model: "Perodua Myvi 1.5 AV",
+      reminder_type: "50k Major Service & Spark Plugs",
+      current_mileage: 58400,
+      status: "overdue",
+      priority: "urgent",
+      days_overdue: 35,
+      mileage_overdue: 3400
+    },
+    {
+      id: "rem-2",
+      customer_id: "c-3",
+      customer_name: "Priya Subramaniam",
+      customer_phone: "+60 16-554 2190",
+      vehicle_plate: "VAB 2020",
+      vehicle_model: "Proton X50 1.5 TGDi",
+      reminder_type: "Brake Pad Inspection",
+      current_mileage: 41800,
+      status: "due",
+      priority: "high",
+      days_overdue: 5,
+      mileage_overdue: 200
+    },
+    {
+      id: "rem-3",
+      customer_id: "c-5",
+      customer_name: "Nurul Huda",
+      customer_phone: "+60 11-399 4410",
+      vehicle_plate: "KV 5502",
+      vehicle_model: "Perodua Bezza 1.3X",
+      reminder_type: "Routine Oil & Filter Service",
+      current_mileage: 94300,
+      status: "due",
+      priority: "normal",
+      days_overdue: 8,
+      mileage_overdue: 700
+    },
+    {
+      id: "rem-4",
+      customer_id: "c-2",
+      customer_name: "Tan Wei Ming",
+      customer_phone: "+60 17-882 1902",
+      vehicle_plate: "PNG 4419",
+      vehicle_model: "Honda Civic RS 1.5 Turbo",
+      reminder_type: "Tire Rotation & Wheel Alignment",
+      current_mileage: 38200,
+      status: "upcoming",
+      priority: "normal",
+      days_overdue: -20,
+      mileage_overdue: -1800
+    }
+  ],
+  inquiries: [
+    {
+      id: "inq-1",
+      customer_name: "Daniel Lim",
+      phone: "+60 18-992 1104",
+      plate_number: "PNG 4419",
+      vehicle_summary: "Honda Civic RS 1.5 Turbo",
+      raw_message: "Hi boss, my Honda Civic PNG 4419 brake pedal feels spongy when coming to a stop. Can I drop it by Bayan Lepas workshop tomorrow at 2:30pm for brake check?",
+      status: "new",
+      created_at: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+      id: "inq-2",
+      customer_name: "Siti Sarah",
+      phone: "+60 13-445 6781",
+      plate_number: "WXY 8821",
+      vehicle_summary: "Perodua Myvi 1.5 AV",
+      raw_message: "Salam Apex AutoWorks, my Perodua Myvi WXY 8821 aircond is blowing warm air at noon. How much to check gas and flush cooling coil?",
+      status: "new",
+      created_at: new Date(Date.now() - 7200000).toISOString()
+    },
+    {
+      id: "inq-3",
+      customer_name: "Mr. Rajendran",
+      phone: "+60 19-332 0918",
+      plate_number: "JRS 7731",
+      vehicle_summary: "Toyota Vios 1.5G",
+      raw_message: "Hello, looking for urgent check engine diagnostic for Toyota Vios plate JRS 7731. Engine idling rough.",
+      status: "in_review",
+      created_at: new Date(Date.now() - 14400000).toISOString()
+    }
+  ],
+  recommendations: [
+    {
+      id: "rec-1",
+      title: "Stock Reorder: 5W-30 Fully Synthetic Engine Oil",
+      category: "inventory",
+      description: "Upcoming appointment surge predicts a 35% higher usage of 5W-30 grade oil over the next 14 days. Reorder 24 canisters to avoid bay downtime.",
+      impact: "High",
+      confidence: 96,
+      status: "pending"
+    },
+    {
+      id: "rec-2",
+      title: "Targeted Brake Service Campaign for Proton X50 Fleet",
+      category: "retention",
+      description: "3 fleet accounts approaching 40,000 km have not logged brake pad renewal. Automated WhatsApp outreach can capture RM 1,320 in bookings.",
+      impact: "Medium",
+      confidence: 91,
+      status: "pending"
+    },
+    {
+      id: "rec-3",
+      title: "Optimize Bay 3 for Air Conditioning Diagnostic Rush",
+      category: "operations",
+      description: "Midday hot weather trend has driven 4 consecutive AC cooling coil inquiries. Dedicate Bay 3 for refrigerant recovery and flush equipment.",
+      impact: "High",
+      confidence: 88,
+      status: "in_progress"
+    }
+  ]
 };
 
 async function fetchWithFallback(endpoint, options = {}, fallbackKey = null) {
@@ -352,7 +615,7 @@ export const api = {
     let q = `?`;
     if (search) q += `search=${encodeURIComponent(search)}&`;
     if (maintenanceStatus) q += `maintenance_status=${encodeURIComponent(maintenanceStatus)}&`;
-    return fetchWithFallback(`/vehicles${q}`);
+    return fetchWithFallback(`/vehicles${q}`, {}, 'vehicles');
   },
   getVehicleById: (id) => fetchWithFallback(`/vehicles/${id}`),
   registerVehicle: (data) => fetchWithFallback(`/vehicles`, { method: 'POST', body: JSON.stringify(data) }),
@@ -420,7 +683,7 @@ export const api = {
     let q = '?';
     if (status) q += `status=${encodeURIComponent(status)}&`;
     if (date) q += `date=${encodeURIComponent(date)}&`;
-    return fetchWithFallback(`/appointments${q}`);
+    return fetchWithFallback(`/appointments${q}`, {}, 'appointments');
   },
   createAppointment: (data) =>
     fetchWithFallback(`/appointments`, { method: 'POST', body: JSON.stringify(data) }),
@@ -430,7 +693,7 @@ export const api = {
   // 12. Inquiries & Leads Inbox
   getInquiries: (status = '') => {
     let q = status ? `?status=${encodeURIComponent(status)}` : '';
-    return fetchWithFallback(`/inquiries${q}`);
+    return fetchWithFallback(`/inquiries${q}`, {}, 'inquiries');
   },
   createInquiry: (data) =>
     fetchWithFallback(`/inquiries`, { method: 'POST', body: JSON.stringify(data) }),
@@ -440,7 +703,7 @@ export const api = {
   // 13. Service Reminders
   getReminders: (status = '') => {
     let q = status ? `?status=${encodeURIComponent(status)}` : '';
-    return fetchWithFallback(`/reminders${q}`);
+    return fetchWithFallback(`/reminders${q}`, {}, 'reminders');
   },
   sendReminderWhatsApp: (id, phone, message) =>
     fetchWithFallback(`/reminders/${id}/send-whatsapp?phone=${encodeURIComponent(phone)}&message=${encodeURIComponent(message)}`, { method: 'POST' }),
@@ -450,7 +713,7 @@ export const api = {
     let q = '?';
     if (category) q += `category=${encodeURIComponent(category)}&`;
     if (status) q += `status=${encodeURIComponent(status)}&`;
-    return fetchWithFallback(`/recommendations${q}`);
+    return fetchWithFallback(`/recommendations${q}`, {}, 'recommendations');
   },
   updateRecommendationStatus: (id, status) =>
     fetchWithFallback(`/recommendations/${id}/status`, {

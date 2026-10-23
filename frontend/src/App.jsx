@@ -18,6 +18,7 @@ import CookieBanner from './components/CookieBanner';
 import CommandPaletteModal from './components/CommandPaletteModal';
 import ConfirmModal from './components/ConfirmModal';
 import CopyButton from './components/CopyButton';
+import ErrorBoundary from './components/ErrorBoundary';
 import { AddCustomerModal, AddServiceModal } from './components/Modals';
 import { ToastProvider } from './components/Toast';
 
@@ -365,95 +366,97 @@ export default function App() {
             onScroll={handleScroll}
             tabIndex="-1"
           >
-            {(currentView === 'overview' || currentView === 'dashboard') && (
-              <Dashboard
-                onNavigateView={handleNavigate}
-                onSelectCustomer={setSelectedCustomer}
-              />
-            )}
+            <ErrorBoundary fallbackTitle="Workshop Module Intercepted" onReset={() => handleNavigate('overview')}>
+              {(currentView === 'overview' || currentView === 'dashboard') && (
+                <Dashboard
+                  onNavigateView={handleNavigate}
+                  onSelectCustomer={setSelectedCustomer}
+                />
+              )}
 
-            {currentView === 'customers' && (
-              <CustomerDirectory
-                globalSearch={globalSearch}
-                searchQuery={globalSearch}
-                onSelectCustomer={setSelectedCustomer}
-                onOpenNewCustomer={() => setIsIntakeModalOpen(true)}
-                onAddCustomer={() => setIsIntakeModalOpen(true)}
-              />
-            )}
+              {currentView === 'customers' && (
+                <CustomerDirectory
+                  globalSearch={globalSearch}
+                  searchQuery={globalSearch}
+                  onSelectCustomer={setSelectedCustomer}
+                  onOpenNewCustomer={() => setIsIntakeModalOpen(true)}
+                  onAddCustomer={() => setIsIntakeModalOpen(true)}
+                />
+              )}
 
-            {currentView === 'vehicles' && (
-              <VehiclesView
-                onIntakeVehicle={() => setIsIntakeModalOpen(true)}
-              />
-            )}
+              {currentView === 'vehicles' && (
+                <VehiclesView
+                  onIntakeVehicle={() => setIsIntakeModalOpen(true)}
+                />
+              )}
 
-            {currentView === 'appointments' && (
-              <AppointmentsView
-                onOpenBookingModal={() => setIsServiceModalOpen(true)}
-              />
-            )}
+              {currentView === 'appointments' && (
+                <AppointmentsView
+                  onOpenBookingModal={() => setIsServiceModalOpen(true)}
+                />
+              )}
 
-            {currentView === 'pipeline' && (
-              <PipelineBoard
-                onOpenNewDeal={() => setIsServiceModalOpen(true)}
-                onOpenServiceModal={() => setIsServiceModalOpen(true)}
-                onSelectCustomer={setSelectedCustomer}
-              />
-            )}
+              {currentView === 'pipeline' && (
+                <PipelineBoard
+                  onOpenNewDeal={() => setIsServiceModalOpen(true)}
+                  onOpenServiceModal={() => setIsServiceModalOpen(true)}
+                  onSelectCustomer={setSelectedCustomer}
+                />
+              )}
 
-            {currentView === 'inquiries' && (
-              <InquiriesView />
-            )}
+              {currentView === 'inquiries' && (
+                <InquiriesView />
+              )}
 
-            {currentView === 'reminders' && (
-              <RemindersView
-                onScheduleService={() => setIsServiceModalOpen(true)}
-              />
-            )}
+              {currentView === 'reminders' && (
+                <RemindersView
+                  onScheduleService={() => setIsServiceModalOpen(true)}
+                />
+              )}
 
-            {currentView === 'analytics' && (
-              <AnalyticsView />
-            )}
+              {currentView === 'analytics' && (
+                <AnalyticsView />
+              )}
 
-            {currentView === 'ai_insights' && (
-              <AIInsightsView />
-            )}
+              {currentView === 'ai_insights' && (
+                <AIInsightsView />
+              )}
 
-            {currentView === 'whatsapp' && (
-              <WhatsAppLiveHub
-                onSelectCustomer={setSelectedCustomer}
-              />
-            )}
+              {currentView === 'whatsapp' && (
+                <WhatsAppLiveHub
+                  onSelectCustomer={setSelectedCustomer}
+                />
+              )}
 
-            {currentView === 'faq' && (
-              <FAQView />
-            )}
+              {currentView === 'faq' && (
+                <FAQView />
+              )}
 
-            {currentView === 'settings' && (
-              <SettingsView
-                currentRole={currentRole}
-                onChangeRole={setCurrentRole}
-              />
-            )}
+              {currentView === 'settings' && (
+                <SettingsView
+                  currentRole={currentRole}
+                  onChangeRole={setCurrentRole}
+                />
+              )}
 
-            {/* Custom 404 Fallback Page */}
-            {!VALID_VIEWS.includes(currentView) && (
-              <div className="view-container">
-                <div className="empty-state custom-404-card">
-                  <div style={{ fontSize: '3.2rem', marginBottom: 12 }}>🔧</div>
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px 0' }}>
-                    404 — Workshop Page Not Found
-                  </h2>
-                  <p style={{ color: 'var(--text-muted)', maxWidth: 440, margin: '0 auto 20px auto', fontSize: '0.88rem', lineHeight: 1.55 }}>
-                    The requested workshop module <code>"{currentView}"</code> does not exist or may have been relocated.
-                  </p>
-                  <button className="btn btn-primary btn-sm" onClick={() => handleNavigate('overview')}>
-                    ← Return to Workshop Overview
-                  </button>
+              {/* Custom 404 Fallback Page */}
+              {!VALID_VIEWS.includes(currentView) && (
+                <div className="view-container">
+                  <div className="empty-state custom-404-card">
+                    <div style={{ fontSize: '3.2rem', marginBottom: 12 }}>🔧</div>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px 0' }}>
+                      404 — Workshop Page Not Found
+                    </h2>
+                    <p style={{ color: 'var(--text-muted)', maxWidth: 440, margin: '0 auto 20px auto', fontSize: '0.88rem', lineHeight: 1.55 }}>
+                      The requested workshop module <code>"{currentView}"</code> does not exist or may have been relocated.
+                    </p>
+                    <button className="btn btn-primary btn-sm" onClick={() => handleNavigate('overview')}>
+                      ← Return to Workshop Overview
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </ErrorBoundary>
           </div>
 
           {/* Floating Back to Top Button */}
