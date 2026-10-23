@@ -259,11 +259,6 @@ export default function App() {
                 <span className="breadcrumb-current">{VIEW_TITLES[currentView] || 'Overview'}</span>
               </div>
 
-              <span className="live-status-pill" title="FastAPI and Supabase Realtime Active">
-                <span className="status-indicator-dot"></span>
-                FastAPI v1 • Online
-              </span>
-
               {/* UTM Campaign Tracking Chip */}
               {utmData && (
                 <div className="utm-tracking-pill" title={`UTM Source: ${utmData.source} | Medium: ${utmData.medium} | Campaign: ${utmData.campaign}`}>
@@ -484,26 +479,6 @@ export default function App() {
               <span className="footer-sep">•</span>
               <a href="mailto:support@apexautoworks.my" className="footer-contact-link" title="Email Workshop Desk">
                 ✉️ support@apexautoworks.my
-              </a>
-              <span className="footer-sep">•</span>
-              <button
-                type="button"
-                className="footer-contact-link"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', padding: 0 }}
-                onClick={() => handleNavigate('faq')}
-                title="Workshop Policies & FAQs"
-              >
-                FAQ & Warranties
-              </button>
-              <span className="footer-sep">•</span>
-              <a
-                href="http://127.0.0.1:8000/docs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-contact-link"
-                title="OpenAPI Backend Documentation"
-              >
-                API Docs
               </a>
             </div>
           </footer>
