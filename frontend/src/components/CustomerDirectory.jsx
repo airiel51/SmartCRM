@@ -117,23 +117,30 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <select
-            className="form-select"
-            style={{ width: 180, fontSize: '0.8rem', padding: '6px 12px' }}
-            value={filterRisk}
-            onChange={(e) => setFilterRisk(e.target.value)}
-          >
-            <option value="">All Retention Tiers</option>
-            <option value="Low">Low Risk (Healthy)</option>
-            <option value="Medium">Medium Risk (Due Soon)</option>
-            <option value="High">High Risk (Overdue)</option>
-          </select>
+      </div>
 
-          <button className="btn btn-primary btn-sm" onClick={() => handleOpenIntake && handleOpenIntake()}>
-            <span>+ Intake Vehicle</span>
-          </button>
+      {/* Horizontal Segmented Filter Chips */}
+      <div className="filter-toolbar" style={{ marginBottom: 16 }}>
+        <div className="filter-group">
+          {[
+            { key: '', label: 'All Fleet' },
+            { key: 'Low', label: 'Healthy (Low Risk)' },
+            { key: 'Medium', label: 'Due Soon (Medium)' },
+            { key: 'High', label: 'Overdue (High Risk)' }
+          ].map((tier) => (
+            <button
+              key={tier.key}
+              type="button"
+              className={`filter-chip ${filterRisk === tier.key ? 'active' : ''}`}
+              onClick={() => setFilterRisk(tier.key)}
+            >
+              {tier.label}
+            </button>
+          ))}
         </div>
+        <button className="btn btn-primary btn-sm" onClick={() => handleOpenIntake && handleOpenIntake()} style={{ flexShrink: 0 }}>
+          <span>+ Intake Vehicle</span>
+        </button>
       </div>
 
       {/* Accounts & Vehicles Table */}
