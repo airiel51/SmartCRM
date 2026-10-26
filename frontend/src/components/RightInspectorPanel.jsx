@@ -72,7 +72,7 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
         title="Open Right Inspector Panel"
         style={{
           width: 32,
-          background: '#f8fafc',
+          background: 'var(--bg-card)',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -80,7 +80,7 @@ export default function RightInspectorPanel({ activeCustomer, currentView, isOpe
           color: 'var(--text-muted)',
           fontSize: '0.8rem',
           border: 'none',
-          borderLeft: '1px solid var(--border-subtle)',
+          borderLeft: '1px solid var(--border-color)',
           outline: 'none'
         }}
       >

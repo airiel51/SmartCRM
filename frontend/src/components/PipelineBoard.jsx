@@ -126,19 +126,19 @@ export default function PipelineBoard({ onOpenNewDeal, onOpenServiceModal, onSel
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: col.color }} />
                   <span>{col.label}</span>
                 </div>
-                <span className="badge" style={{ background: '#ffffff', color: '#1a1d23', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <span className="badge" style={{ background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   {colRecords.length}
                 </span>
               </div>
 
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: 12, fontWeight: 600 }}>
-                Total: <strong style={{ color: 'var(--text-dark)' }}>RM {colValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                Total: <strong style={{ color: 'var(--text-main)' }}>RM {colValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
               </div>
 
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {colRecords.length === 0 ? (
                   <div style={{
-                    border: '1px dashed #cbd5e1',
+                    border: '1px dashed var(--border-color)',
                     borderRadius: 12,
                     padding: 24,
                     textAlign: 'center',

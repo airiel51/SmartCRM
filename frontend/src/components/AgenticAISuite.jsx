@@ -376,15 +376,15 @@ export default function AgenticAISuite({ onSelectCustomer }) {
 
                 {/* Message Copy Box */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-app)',
                   padding: 14,
                   borderRadius: 10,
                   fontSize: '0.82rem',
-                  color: 'var(--text-secondary)',
+                  color: 'var(--text-body)',
                   borderLeft: '3px solid #10b981',
                   lineHeight: 1.5,
                   marginBottom: 14,
-                  border: '1px solid #edf0f5'
+                  border: '1px solid var(--border-color)'
                 }}>
                   "{camp.message_template}"
                 </div>

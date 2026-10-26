@@ -120,7 +120,7 @@ export default function AICopilotDrawer({ isOpen, onClose }) {
         </div>
 
         {/* Suggestion Chips */}
-        <div style={{ padding: '12px 18px', borderBottom: '1px solid #edf0f5', display: 'flex', gap: 6, flexWrap: 'wrap', background: '#fafbfd' }}>
+        <div style={{ padding: '12px 18px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: 6, flexWrap: 'wrap', background: 'var(--bg-app)' }}>
           {suggestionChips.map((chip, idx) => (
             <button
               key={idx}
@@ -129,9 +129,9 @@ export default function AICopilotDrawer({ isOpen, onClose }) {
                 fontSize: '0.72rem',
                 padding: '4px 10px',
                 borderRadius: 9999,
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-                color: '#565d6d',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-main)',
                 cursor: 'pointer',
                 fontWeight: 600
               }}
@@ -151,9 +151,9 @@ export default function AICopilotDrawer({ isOpen, onClose }) {
                 borderRadius: 14,
                 fontSize: '0.86rem',
                 lineHeight: 1.5,
-                background: m.role === 'user' ? '#1c1e22' : '#f4f6fa',
-                color: m.role === 'user' ? '#ffffff' : '#1a1d23',
-                border: m.role === 'user' ? 'none' : '1px solid #edf0f5'
+                background: m.role === 'user' ? 'var(--primary-color)' : 'var(--bg-card)',
+                color: m.role === 'user' ? '#ffffff' : 'var(--text-main)',
+                border: m.role === 'user' ? 'none' : '1px solid var(--border-color)'
               }}>
                 <div dangerouslySetInnerHTML={{
                   __html: m.text
@@ -172,9 +172,9 @@ export default function AICopilotDrawer({ isOpen, onClose }) {
                         fontSize: '0.74rem',
                         padding: '4px 10px',
                         borderRadius: 9999,
-                        background: '#ffffff',
-                        border: '1px solid #cbd5e1',
-                        color: '#1e293b',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        color: 'var(--text-main)',
                         fontWeight: 600,
                         cursor: 'pointer'
                       }}
@@ -188,7 +188,7 @@ export default function AICopilotDrawer({ isOpen, onClose }) {
           ))}
 
           {loading && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: '#f4f6fa', borderRadius: 12, color: '#64748b', fontSize: '0.82rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 12, color: 'var(--text-muted)', fontSize: '0.82rem' }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6366f1' }} />
               <span>Analyzing workshop database with Agent nodes...</span>
             </div>
@@ -197,7 +197,7 @@ export default function AICopilotDrawer({ isOpen, onClose }) {
         </div>
 
         {/* Input Bar */}
-        <div style={{ padding: '14px 18px', borderTop: '1px solid #edf0f5', display: 'flex', gap: 8, background: '#ffffff' }}>
+        <div style={{ padding: '14px 18px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: 8, background: 'var(--bg-card)' }}>
           <input
             type="text"
             placeholder="Ask AI anything about workshop metrics, intervals, or chats..."
@@ -206,12 +206,12 @@ export default function AICopilotDrawer({ isOpen, onClose }) {
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             style={{
               flex: 1,
-              background: '#f4f6fa',
-              border: '1px solid #e2e8f0',
+              background: 'var(--bg-app)',
+              border: '1px solid var(--border-color)',
               borderRadius: 8,
               padding: '9px 14px',
               fontSize: '0.88rem',
-              color: '#1a1d23',
+              color: 'var(--text-main)',
               outline: 'none'
             }}
           />

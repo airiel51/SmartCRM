@@ -154,23 +154,23 @@ export default function SupabaseSyncView() {
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, fontSize: '0.8rem' }}>
-            <div style={{ background: '#f6f8fb', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
-              🗄️ <strong style={{ color: 'var(--text-dark)' }}>customers</strong> (RLS Enabled)
+            <div style={{ background: 'var(--bg-app)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+              🗄️ <strong style={{ color: 'var(--text-main)' }}>customers</strong> (RLS Enabled)
             </div>
-            <div style={{ background: '#f6f8fb', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
-              🚘 <strong style={{ color: 'var(--text-dark)' }}>vehicles</strong> (Multi-Vehicle)
+            <div style={{ background: 'var(--bg-app)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+              🚘 <strong style={{ color: 'var(--text-main)' }}>vehicles</strong> (Multi-Vehicle)
             </div>
-            <div style={{ background: '#f6f8fb', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
-              🔧 <strong style={{ color: 'var(--text-dark)' }}>service_records</strong> (Kanban)
+            <div style={{ background: 'var(--bg-app)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+              🔧 <strong style={{ color: 'var(--text-main)' }}>service_records</strong> (Kanban)
             </div>
-            <div style={{ background: '#f6f8fb', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
-              💬 <strong style={{ color: 'var(--text-dark)' }}>whatsapp_interactions</strong>
+            <div style={{ background: 'var(--bg-app)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+              💬 <strong style={{ color: 'var(--text-main)' }}>whatsapp_interactions</strong>
             </div>
-            <div style={{ background: '#f6f8fb', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
-              📈 <strong style={{ color: 'var(--text-dark)' }}>mileage_logs</strong> (Odometer)
+            <div style={{ background: 'var(--bg-app)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+              📈 <strong style={{ color: 'var(--text-main)' }}>mileage_logs</strong> (Odometer)
             </div>
-            <div style={{ background: '#f6f8fb', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
-              🎯 <strong style={{ color: 'var(--text-dark)' }}>ai_campaigns</strong> (Promos)
+            <div style={{ background: 'var(--bg-app)', padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+              🎯 <strong style={{ color: 'var(--text-main)' }}>ai_campaigns</strong> (Promos)
             </div>
           </div>
         </div>

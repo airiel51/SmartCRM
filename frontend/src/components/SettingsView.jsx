@@ -502,7 +502,7 @@ export default function SettingsView({ currentRole, onChangeRole }) {
                 <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', marginBottom: 14 }}>
                   Gemini 2.5 Flash powers real-time NLP Malaysian license plate extraction, symptom diagnosis, and chat extraction.
                 </p>
-                <div style={{ background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid var(--border-subtle)', marginBottom: 16, fontSize: '0.82rem' }}>
+                <div style={{ background: 'var(--bg-app)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', marginBottom: 16, fontSize: '0.82rem', color: 'var(--text-main)' }}>
                   <div>Model: <strong>gemini-2.5-flash</strong></div>
                   <div style={{ marginTop: 4 }}>Environment Key: <code>GEMINI_API_KEY (configured)</code></div>
                   <div style={{ marginTop: 4 }}>Status: <span style={{ color: '#10b981', fontWeight: 700 }}>Active • Rules & AI Hybrid Fallback</span></div>

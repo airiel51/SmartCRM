@@ -586,7 +586,7 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
 
                 {/* Entities Grid: Plate, Slot, Sentiment, Urgency */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-                  <div style={{ background: '#f8fafc', padding: 10, borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ background: 'var(--bg-app)', padding: 10, borderRadius: 10, border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                       Vehicle Plate & Model
                     </div>
@@ -600,7 +600,7 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
                     </div>
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: 10, borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ background: 'var(--bg-app)', padding: 10, borderRadius: 10, border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                       Extracted Appointment Slot
                     </div>
@@ -609,7 +609,7 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
                     </div>
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: 10, borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ background: 'var(--bg-app)', padding: 10, borderRadius: 10, border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                       Sentiment & Urgency
                     </div>
@@ -623,22 +623,22 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
                     </div>
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: 10, borderRadius: 10, border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ background: 'var(--bg-app)', padding: 10, borderRadius: 10, border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                       Customer Intent
                     </div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-dark)', marginTop: 4 }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)', marginTop: 4 }}>
                       💬 {extractionResult.intent}
                     </div>
                   </div>
                 </div>
 
                 {/* Auto Reply Preview */}
-                <div style={{ background: '#f8fafc', padding: 14, borderRadius: 12, border: '1px solid var(--border-subtle)' }}>
+                <div style={{ background: 'var(--bg-app)', padding: 14, borderRadius: 12, border: '1px solid var(--border-color)' }}>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 4 }}>
                     Automated Malaysian WhatsApp Reply
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.45, fontStyle: 'italic' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.45, fontStyle: 'italic' }}>
                     "{extractionResult.suggested_auto_reply}"
                   </div>
                 </div>
