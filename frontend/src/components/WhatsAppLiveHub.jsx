@@ -320,23 +320,23 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
         
         {/* Left: WhatsApp Phone Simulator */}
         <div className="whatsapp-phone-col" style={{
-          background: '#ffffff',
+          background: 'var(--bg-card)',
           borderRadius: 20,
-          border: '1px solid var(--border-subtle)',
+          border: '1px solid var(--border-color)',
           overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.05)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
           display: 'flex',
           flexDirection: 'column',
           height: 560
         }}>
           {/* Header */}
-          <div style={{
-            background: '#f6f8fb',
+          <div className="whatsapp-phone-header" style={{
+            background: 'var(--border-subtle)',
             padding: '12px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: 12,
-            borderBottom: '1px solid var(--border-subtle)'
+            borderBottom: '1px solid var(--border-color)'
           }}>
             <div style={{
               width: 36,
@@ -353,7 +353,7 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
               {activeScenario.sender.charAt(0)}
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-dark)' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-main)' }}>
                 {activeScenario.sender}
               </div>
               <div style={{ fontSize: '0.72rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -369,21 +369,21 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
                 <span>• online</span>
               </div>
             </div>
-            <div style={{ color: '#8c94a4', fontSize: '1.1rem' }}>⋮</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>⋮</div>
           </div>
 
           {/* Messages Body */}
-          <div style={{
+          <div className="whatsapp-messages-body" style={{
             flex: 1,
             padding: 16,
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
             gap: 12,
-            background: '#fafbfd'
+            background: 'var(--bg-app)'
           }}>
             <div style={{ textAlign: 'center', margin: '4px 0' }}>
-              <span style={{ fontSize: '0.68rem', background: '#edf0f5', color: '#64748b', padding: '3px 10px', borderRadius: 9999, fontWeight: 600 }}>
+              <span style={{ fontSize: '0.68rem', background: 'var(--border-subtle)', color: 'var(--text-muted)', padding: '3px 10px', borderRadius: 9999, fontWeight: 600 }}>
                 End-to-End Encrypted Automotive Inquiry
               </span>
             </div>
@@ -391,24 +391,25 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
             {chatMessages.map(msg => (
               <div
                 key={msg.id}
+                className={msg.direction === 'inbound' ? 'whatsapp-inbound-bubble' : ''}
                 style={{
                   alignSelf: msg.direction === 'outbound' ? 'flex-end' : 'flex-start',
                   maxWidth: '85%',
-                  background: msg.direction === 'outbound' ? '#1c1e22' : '#ffffff',
-                  color: msg.direction === 'outbound' ? '#ffffff' : 'var(--text-dark)',
+                  background: msg.direction === 'outbound' ? 'var(--primary-color)' : 'var(--bg-card)',
+                  color: msg.direction === 'outbound' ? '#ffffff' : 'var(--text-main)',
                   padding: '10px 14px',
                   borderRadius: 14,
                   fontSize: '0.82rem',
                   lineHeight: 1.45,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                  border: msg.direction === 'outbound' ? 'none' : '1px solid #edf0f5'
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                  border: msg.direction === 'outbound' ? 'none' : '1px solid var(--border-color)'
                 }}
               >
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: msg.direction === 'outbound' ? '#38bdf8' : '#10b981', marginBottom: 2 }}>
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: msg.direction === 'outbound' ? '#93c5fd' : '#10b981', marginBottom: 2 }}>
                   {msg.sender}
                 </div>
                 <div>{msg.text}</div>
-                <div style={{ fontSize: '0.65rem', color: msg.direction === 'outbound' ? '#94a3b8' : '#8c94a4', textAlign: 'right', marginTop: 4 }}>
+                <div style={{ fontSize: '0.65rem', color: msg.direction === 'outbound' ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-muted)', textAlign: 'right', marginTop: 4 }}>
                   {msg.time} {msg.direction === 'outbound' && '✓✓'}
                 </div>
               </div>
@@ -416,13 +417,13 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
           </div>
 
           {/* Chat Input */}
-          <div style={{
-            background: '#ffffff',
+          <div className="whatsapp-chat-input-bar" style={{
+            background: 'var(--bg-card)',
             padding: '10px 14px',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            borderTop: '1px solid var(--border-subtle)'
+            borderTop: '1px solid var(--border-color)'
           }}>
             <input
               type="text"
@@ -430,13 +431,14 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              className="whatsapp-chat-input"
               style={{
                 flex: 1,
-                background: '#f4f6fa',
-                border: '1px solid #edf0f5',
+                background: 'var(--bg-app)',
+                border: '1px solid var(--border-color)',
                 borderRadius: 9999,
                 padding: '8px 16px',
-                color: 'var(--text-dark)',
+                color: 'var(--text-main)',
                 fontSize: '0.84rem',
                 outline: 'none'
               }}
@@ -444,7 +446,7 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
             <button
               onClick={handleSendMessage}
               style={{
-                background: '#1c1e22',
+                background: 'var(--primary-color)',
                 border: 'none',
                 borderRadius: '50%',
                 width: 34,
@@ -552,25 +554,25 @@ export default function WhatsAppLiveHub({ onSelectCustomer }) {
                 {/* 3. Workshop Technician Diagnostic Checklist */}
                 {extractionResult.diagnosis_steps && extractionResult.diagnosis_steps.length > 0 && (
                   <div style={{
-                    background: '#f8fafc',
+                    background: 'var(--bg-app)',
                     padding: 12,
                     borderRadius: 12,
-                    border: '1px solid var(--border-subtle)'
+                    border: '1px solid var(--border-color)'
                   }}>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-dark)', textTransform: 'uppercase', fontWeight: 800, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-main)', textTransform: 'uppercase', fontWeight: 800, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span>📋 Technician Diagnostic Checklist</span>
                       <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600 }}>({extractionResult.diagnosis_steps.length} inspection points)</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {extractionResult.diagnosis_steps.map((st, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#ffffff', padding: '6px 10px', borderRadius: 8, border: '1px solid #edf0f5', fontSize: '0.76rem' }}>
-                          <span style={{ color: 'var(--text-dark)', fontWeight: 600 }}>
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-card)', padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border-color)', fontSize: '0.76rem' }}>
+                          <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>
                             {idx + 1}. {st.step}
                           </span>
                           {st.result && (
                             <div style={{ display: 'flex', gap: 4 }}>
                               {st.result.map((r, rIdx) => (
-                                <span key={rIdx} style={{ fontSize: '0.66rem', padding: '1px 6px', borderRadius: 4, background: rIdx === 0 ? '#fee2e2' : '#ecfdf5', color: rIdx === 0 ? '#991b1b' : '#065f46', fontWeight: 700 }}>
+                                <span key={rIdx} style={{ fontSize: '0.66rem', padding: '1px 6px', borderRadius: 4, background: rIdx === 0 ? 'var(--semantic-danger-bg)' : 'var(--semantic-success-bg)', color: rIdx === 0 ? 'var(--semantic-danger-text)' : 'var(--semantic-success-text)', border: `1px solid ${rIdx === 0 ? 'var(--semantic-danger-border)' : 'var(--semantic-success-border)'}`, fontWeight: 700 }}>
                                   {r}
                                 </span>
                               ))}

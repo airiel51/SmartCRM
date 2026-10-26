@@ -213,12 +213,10 @@ export default function AgenticAIChatbotWidget({
             width: isExpanded ? 460 : 380,
             height: isExpanded ? '100vh' : 580,
             maxHeight: isExpanded ? '100vh' : 'calc(100vh - 40px)',
-            background: '#ffffff',
             borderRadius: isExpanded ? '16px 0 0 16px' : 16,
-            border: '1px solid #e2e8f0',
             boxShadow: isExpanded
-              ? '-8px 0 32px rgba(0, 0, 0, 0.12)'
-              : '0 16px 40px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(0, 0, 0, 0.04)',
+              ? '-8px 0 32px rgba(0, 0, 0, 0.25)'
+              : '0 16px 40px rgba(15, 23, 42, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08)',
             display: 'flex',
             flexDirection: 'column',
             zIndex: 1000,
@@ -323,23 +321,21 @@ export default function AgenticAIChatbotWidget({
 
           {/* Active Context Ribbon */}
           <div
+            className="chatbot-context-ribbon"
             style={{
               padding: '6px 14px',
-              background: '#f8fafc',
-              borderBottom: '1px solid #edf0f5',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              fontSize: '0.7rem',
-              color: '#64748b'
+              fontSize: '0.7rem'
             }}
           >
             <div>
               <span>Context: </span>
-              <strong style={{ color: '#334155' }}>{currentViewLabel}</strong>
+              <strong>{currentViewLabel}</strong>
             </div>
             {selectedCustomer && (
-              <span style={{ fontWeight: 600, color: '#0f172a' }}>
+              <span style={{ fontWeight: 600 }}>
                 {selectedCustomer.name?.split(' ')[0] || 'Customer'}
               </span>
             )}
@@ -347,10 +343,9 @@ export default function AgenticAIChatbotWidget({
 
           {/* Quick Suggestion Chips Carousel */}
           <div
+            className="chatbot-chips-bar"
             style={{
               padding: '8px 12px',
-              background: '#ffffff',
-              borderBottom: '1px solid #f1f5f9',
               display: 'flex',
               gap: 6,
               overflowX: 'auto',
@@ -361,13 +356,11 @@ export default function AgenticAIChatbotWidget({
               <button
                 key={idx}
                 onClick={() => handleSend(chip)}
+                className="chatbot-suggestion-chip"
                 style={{
                   fontSize: '0.7rem',
                   padding: '4px 10px',
                   borderRadius: 9999,
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  color: '#475569',
                   cursor: 'pointer',
                   fontWeight: 600,
                   transition: 'all 0.15s ease'
@@ -380,14 +373,14 @@ export default function AgenticAIChatbotWidget({
 
           {/* Message Stream */}
           <div
+            className="chatbot-messages-stream"
             style={{
               flex: 1,
               padding: '14px',
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              gap: 12,
-              background: '#fafbfd'
+              gap: 12
             }}
           >
             {messages.map((m) => (
@@ -400,16 +393,16 @@ export default function AgenticAIChatbotWidget({
                 }}
               >
                 <div
+                  className={m.role === 'user' ? 'chatbot-bubble-user' : 'chatbot-bubble-ai'}
                   style={{
                     maxWidth: '88%',
                     padding: '10px 14px',
                     borderRadius: 12,
                     fontSize: '0.82rem',
                     lineHeight: 1.5,
-                    background: m.role === 'user' ? '#1c1e22' : '#ffffff',
-                    color: m.role === 'user' ? '#ffffff' : '#0f172a',
-                    border: m.role === 'user' ? 'none' : '1px solid #e2e8f0',
-                    boxShadow: m.role === 'user' ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.03)'
+                    background: m.role === 'user' ? '#2563eb' : undefined,
+                    color: m.role === 'user' ? '#ffffff' : undefined,
+                    border: m.role === 'user' ? 'none' : undefined
                   }}
                 >
                   <div
@@ -422,7 +415,7 @@ export default function AgenticAIChatbotWidget({
                   <div
                     style={{
                       fontSize: '0.62rem',
-                      color: m.role === 'user' ? '#94a3b8' : '#94a3b8',
+                      color: m.role === 'user' ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-muted)',
                       marginTop: 4,
                       textAlign: 'right'
                     }}
@@ -446,24 +439,21 @@ export default function AgenticAIChatbotWidget({
                       <button
                         key={aIdx}
                         onClick={() => handleActionClick(act)}
+                        className="chatbot-action-btn"
                         style={{
                           fontSize: '0.72rem',
                           padding: '4px 10px',
                           borderRadius: 9999,
-                          background: '#ffffff',
-                          border: '1px solid #cbd5e1',
-                          color: '#1e293b',
                           fontWeight: 600,
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           gap: 4,
-                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
                           transition: 'all 0.15s ease'
                         }}
                       >
                         <span>{act.label}</span>
-                        {act.targetView && <span style={{ color: '#64748b', fontSize: '0.7rem' }}>➔</span>}
+                        {act.targetView && <span style={{ fontSize: '0.7rem' }}>➔</span>}
                       </button>
                     ))}
                   </div>
@@ -473,15 +463,13 @@ export default function AgenticAIChatbotWidget({
 
             {loading && (
               <div
+                className="chatbot-loading-indicator"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
                   padding: '8px 12px',
-                  background: '#ffffff',
-                  border: '1px solid #e2e8f0',
                   borderRadius: 10,
-                  color: '#64748b',
                   fontSize: '0.76rem',
                   maxWidth: '85%'
                 }}
@@ -494,12 +482,11 @@ export default function AgenticAIChatbotWidget({
 
           {/* Chatbot Input Bar */}
           <div
+            className="chatbot-input-bar"
             style={{
               padding: '10px 14px',
-              borderTop: '1px solid #e2e8f0',
               display: 'flex',
               gap: 8,
-              background: '#ffffff',
               alignItems: 'center'
             }}
           >
@@ -509,14 +496,12 @@ export default function AgenticAIChatbotWidget({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              className="chatbot-input-field"
               style={{
                 flex: 1,
-                background: '#f8fafc',
-                border: '1px solid #cbd5e1',
                 borderRadius: 8,
                 padding: '8px 12px',
                 fontSize: '0.82rem',
-                color: '#0f172a',
                 outline: 'none',
                 fontFamily: 'inherit'
               }}
@@ -525,7 +510,7 @@ export default function AgenticAIChatbotWidget({
               onClick={() => handleSend()}
               disabled={loading || !input.trim()}
               style={{
-                background: input.trim() ? '#1c1e22' : '#cbd5e1',
+                background: input.trim() ? '#2563eb' : 'var(--border-color)',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: 8,
