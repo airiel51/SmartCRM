@@ -98,54 +98,58 @@ class _MainWorkshopNavigationState extends State<MainWorkshopNavigation> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
-        ),
-        child: NavigationBarTheme(
-          data: NavigationBarThemeData(
-            backgroundColor: Colors.white,
-            indicatorColor: const Color(0xFF1E293B),
-            labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
-              if (states.contains(WidgetState.selected)) {
-                return const TextStyle(color: Color(0xFF0F172A), fontSize: 11, fontWeight: FontWeight.w800);
-              }
-              return const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.w500);
-            }),
-            iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
-              if (states.contains(WidgetState.selected)) {
-                return const IconThemeData(color: Colors.white, size: 20);
-              }
-              return const IconThemeData(color: Color(0xFF64748B), size: 20);
-            }),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        bottom: true,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
           ),
-          child: NavigationBar(
-            selectedIndex: _currentIndex,
-            onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
-            elevation: 0,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.grid_view_rounded),
-                selectedIcon: Icon(Icons.grid_view_rounded),
-                label: 'Overview',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.car_repair_outlined),
-                selectedIcon: Icon(Icons.car_repair_rounded),
-                label: 'Bays',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.chat_bubble_outline_rounded),
-                selectedIcon: Icon(Icons.chat_bubble_rounded),
-                label: 'Reminders',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.people_outline_rounded),
-                selectedIcon: Icon(Icons.people_rounded),
-                label: 'Customers',
-              ),
-            ],
+          child: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              backgroundColor: Colors.white,
+              indicatorColor: const Color(0xFF1E293B),
+              labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return const TextStyle(color: Color(0xFF0F172A), fontSize: 11, fontWeight: FontWeight.w800);
+                }
+                return const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.w500);
+              }),
+              iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return const IconThemeData(color: Colors.white, size: 20);
+                }
+                return const IconThemeData(color: Color(0xFF64748B), size: 20);
+              }),
+            ),
+            child: NavigationBar(
+              selectedIndex: _currentIndex,
+              onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
+              elevation: 0,
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.grid_view_rounded),
+                  selectedIcon: Icon(Icons.grid_view_rounded),
+                  label: 'Overview',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.car_repair_outlined),
+                  selectedIcon: Icon(Icons.car_repair_rounded),
+                  label: 'Bays',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.chat_bubble_outline_rounded),
+                  selectedIcon: Icon(Icons.chat_bubble_rounded),
+                  label: 'Reminders',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.people_outline_rounded),
+                  selectedIcon: Icon(Icons.people_rounded),
+                  label: 'Customers',
+                ),
+              ],
+            ),
           ),
         ),
       ),

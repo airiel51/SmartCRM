@@ -172,16 +172,16 @@ export default function VehiclesView({ onIntakeVehicle }) {
               <tbody>
                 {vehicles.map((v) => (
                   <tr key={v.id}>
-                    <td>
+                    <td data-label="Plate Number">
                       <span className="plate-mono-tag">{v.plate_number}</span>
                     </td>
-                    <td>
+                    <td data-label="Vehicle Details">
                       <div style={{ fontWeight: 600 }}>{v.make} {v.model}</div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                         {v.year} • {v.oil_type || 'Synthetic 5W-30'}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Owner">
                       <div style={{ fontWeight: 500 }}>{v.customer_name || 'Registered Owner'}</div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
                         {v.customer_phone ? (
@@ -191,13 +191,13 @@ export default function VehiclesView({ onIntakeVehicle }) {
                         ) : '-'}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Current Odometer">
                       <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{(v.current_mileage || 0).toLocaleString()} km</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                         ~{v.daily_mileage_rate || 40} km/day
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Next Service Due">
                       <div style={{ fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                         {v.next_service_due_mileage ? `${v.next_service_due_mileage.toLocaleString()} km` : '-'}
                       </div>
@@ -205,8 +205,8 @@ export default function VehiclesView({ onIntakeVehicle }) {
                         {v.next_service_due_date ? new Date(v.next_service_due_date).toLocaleDateString() : '-'}
                       </div>
                     </td>
-                    <td>{getStatusBadge(v.maintenance_status)}</td>
-                    <td style={{ textAlign: 'right' }}>
+                    <td data-label="Status">{getStatusBadge(v.maintenance_status)}</td>
+                    <td data-label="Actions" style={{ textAlign: 'right' }}>
                       <button
                         className="btn btn-xs btn-outline-primary"
                         onClick={() =>

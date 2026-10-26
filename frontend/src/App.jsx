@@ -493,6 +493,28 @@ export default function App() {
         {/* GDPR / Malaysian PDPA Cookie Consent Banner */}
         <CookieBanner />
 
+        {/* Mobile Persistent Bottom Navigation Bar (< 640px) */}
+        <nav className="smartcrm-mobile-bottom-nav" aria-label="Mobile Navigation">
+          {[
+            { id: 'overview', icon: '📊', label: 'Overview' },
+            { id: 'pipeline', icon: '🚘', label: 'Bays' },
+            { id: 'appointments', icon: '📅', label: 'Bookings' },
+            { id: 'reminders', icon: '💬', label: 'Alerts' },
+            { id: 'customers', icon: '👥', label: 'Fleet' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={`mobile-bottom-nav-item ${currentView === tab.id ? 'active' : ''}`}
+              onClick={() => handleNavigate(tab.id)}
+              aria-label={tab.label}
+            >
+              <span className="nav-icon">{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+
         {/* Global Command Palette / Site Search Modal (Ctrl+K) */}
         <CommandPaletteModal
           isOpen={isSearchPaletteOpen}

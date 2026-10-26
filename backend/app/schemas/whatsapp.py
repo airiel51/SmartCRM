@@ -18,7 +18,15 @@ class NLPExtractionResult(BaseModel):
     vehicle_id: Optional[str] = None
     vehicle_matched: Optional[str] = None
     symptoms_detected: List[str] = []
+    system_category: Optional[str] = None
+    diagnosed_problem: Optional[str] = None
+    problem_confidence: Optional[float] = None
     recommended_service: str
+    solution_confidence: Optional[float] = None
+    diagnosis_steps: List[Dict[str, Any]] = []
+    parts_required: Optional[str] = None
+    diagnostic_explanation: Optional[str] = None
+    is_ml_diagnosed: bool = True
     estimated_cost: float
     requested_appointment: Optional[str] = None
     sentiment_score: float

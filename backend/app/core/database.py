@@ -13,7 +13,11 @@ try:
     if settings.USE_SQLITE_FALLBACK:
         # Check if Postgres can be reached, or use SQLite
         try:
-            test_engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+            test_engine = create_engine(
+                settings.DATABASE_URL,
+                pool_pre_ping=True,
+                connect_args={"connect_timeout": 2}
+            )
             with test_engine.connect() as conn:
                 logger.info("Successfully connected to PostgreSQL database.")
             engine = test_engine

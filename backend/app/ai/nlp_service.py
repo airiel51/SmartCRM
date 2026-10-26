@@ -251,24 +251,32 @@ class NLPService:
         model = car_info["model"]
         appointment = cls.extract_appointment_time(text)
 
-        # 3. Detect Symptoms & Match Service
-        symptoms_detected = []
-        recommended_service = "Periodic Vehicle Inspection & Maintenance"
-        estimated_cost = 180.00
-        parts_summary = "Multi-point safety inspection"
+        # 3. ML Vehicle Diagnostic & Solution Inference (Kaggle-Trained Model)
+        from app.ai.diagnostic_engine import diagnostic_engine
+        
+        ml_diag = diagnostic_engine.diagnose_inquiry(
+            message=text,
+            vehicle_make=make,
+            service_history="Regular Maintenance"
+        )
+        
+        system_category = ml_diag.get("system_category", "Automotive Systems")
+        diagnosed_problem = ml_diag.get("diagnosed_problem", "General Maintenance / Inspection Required")
+        problem_confidence = ml_diag.get("problem_confidence", 0.70)
+        recommended_service = ml_diag.get("recommended_solution", "Periodic Vehicle Inspection & Maintenance")
+        solution_confidence = ml_diag.get("solution_confidence", 0.75)
+        diagnosis_steps = ml_diag.get("diagnosis_steps", [])
+        estimated_cost = ml_diag.get("estimated_cost", 180.00)
+        parts_summary = ml_diag.get("parts_required", "Multi-point safety inspection")
+        diagnostic_explanation = ml_diag.get("diagnostic_explanation", "Routine diagnostic assessment recommended.")
 
+        symptoms_detected = [diagnosed_problem]
         for mapping in cls.SYMPTOM_SERVICE_MAP:
             for kw in mapping["keywords"]:
                 if kw in clean_text:
                     if mapping["symptom"] not in symptoms_detected:
                         symptoms_detected.append(mapping["symptom"])
-                        recommended_service = mapping["service"]
-                        estimated_cost = mapping["estimated_cost"]
-                        parts_summary = mapping["parts"]
                     break
-
-        if not symptoms_detected:
-            symptoms_detected.append("General Maintenance / Diagnostic Request")
 
         # 4. Intent Classification
         if any(w in clean_text for w in ["book", "appointment", "drop by", "come in", "slot", "bring"]):
@@ -293,14 +301,20 @@ class NLPService:
         if plate:
             veh_str += f" ({plate})"
 
-        # 6. Generate Automated WhatsApp Reply
+        # 6. Generate Automated WhatsApp Reply with Diagnosis & Suggested Solution
         client_greeting = f"Hi {customer_name}" if customer_name else "Hello"
         reply = (
             f"{client_greeting}! Thank you for contacting Apex AutoWorks & Diagnostic Centre.\n\n"
-            f"We have noted your inquiry regarding {veh_str} and the reported symptom: '{symptoms_detected[0]}'.\n"
-            f"Recommended Package: {recommended_service} (Est. RM {estimated_cost:.2f}, includes {parts_summary}).\n"
-            f"Preferred Time Slot: {appointment}.\n\n"
-            f"Our Person-in-Charge (PIC) Airiel has reserved a preliminary bay slot for you. "
+            f"🔍 *AI Diagnosis for {veh_str}*:\n"
+            f"• Subsystem: {system_category}\n"
+            f"• Component Identified: {diagnosed_problem} ({int(problem_confidence * 100)}% match)\n"
+            f"• Assessment: {diagnostic_explanation}\n\n"
+            f"🛠️ *Suggested Workshop Solution*:\n"
+            f"• Package: {recommended_service} ({int(solution_confidence * 100)}% match)\n"
+            f"• Parts & Labor: {parts_summary}\n"
+            f"• Estimated Quote: RM {estimated_cost:.2f}\n"
+            f"• Bay Slot: {appointment}\n\n"
+            f"Our PIC Airiel has reserved a preliminary bay slot for you. "
             f"Please reply 'CONFIRM' to finalize your booking, or let us know if you prefer a different time!"
         )
 
@@ -312,7 +326,15 @@ class NLPService:
             "vehicle_model": model,
             "vehicle_matched": veh_str,
             "symptoms_detected": symptoms_detected,
+            "system_category": system_category,
+            "diagnosed_problem": diagnosed_problem,
+            "problem_confidence": problem_confidence,
             "recommended_service": recommended_service,
+            "solution_confidence": solution_confidence,
+            "diagnosis_steps": diagnosis_steps,
+            "parts_required": parts_summary,
+            "diagnostic_explanation": diagnostic_explanation,
+            "is_ml_diagnosed": True,
             "estimated_cost": estimated_cost,
             "requested_appointment": appointment,
             "sentiment_score": sentiment_score,

@@ -177,11 +177,11 @@ export default function RemindersView({ onScheduleService }) {
               <tbody>
                 {reminders.map((rem) => (
                   <tr key={rem.id}>
-                    <td>
+                    <td data-label="Vehicle">
                       <span className="plate-mono-tag">{rem.vehicle_plate}</span>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>{rem.vehicle_model}</div>
                     </td>
-                    <td>
+                    <td data-label="Customer">
                       <div style={{ fontWeight: 600 }}>{rem.customer_name}</div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
                         {rem.customer_phone ? (
@@ -191,13 +191,13 @@ export default function RemindersView({ onScheduleService }) {
                         ) : '-'}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Maintenance Interval">
                       <div style={{ fontWeight: 600, textTransform: 'capitalize' }}>
                         {rem.reminder_type.replace('_', ' ')}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{rem.notes}</div>
                     </td>
-                    <td>
+                    <td data-label="Due Threshold">
                       <div style={{ fontWeight: 600 }}>
                         {rem.due_mileage ? `${rem.due_mileage.toLocaleString()} km` : '-'}
                       </div>
@@ -205,9 +205,9 @@ export default function RemindersView({ onScheduleService }) {
                         {rem.due_date ? new Date(rem.due_date).toLocaleDateString() : '-'}
                       </div>
                     </td>
-                    <td>{getStatusBadge(rem.status)}</td>
-                    <td>{getPriorityBadge(rem.priority)}</td>
-                    <td style={{ textAlign: 'right' }}>
+                    <td data-label="Interval State">{getStatusBadge(rem.status)}</td>
+                    <td data-label="Priority">{getPriorityBadge(rem.priority)}</td>
+                    <td data-label="Actions" style={{ textAlign: 'right' }}>
                       <div style={{ display: 'inline-flex', gap: 6 }}>
                         <button
                           className="btn btn-xs btn-outline-primary"

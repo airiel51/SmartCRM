@@ -626,10 +626,15 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              value,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: valueColor),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: valueColor),
+              ),
             ),
             const SizedBox(height: 2),
             Text(

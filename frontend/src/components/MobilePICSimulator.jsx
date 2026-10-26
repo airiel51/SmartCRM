@@ -856,13 +856,14 @@ export default function MobilePICSimulator({ onSelectCustomer }) {
 
           {/* Bottom Navigation Bar */}
           <div style={{
-            height: 58,
+            minHeight: 58,
+            height: 'auto',
             background: '#0f172a',
             borderTop: '1px solid #1e293b',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-around',
-            padding: '0 4px',
+            padding: '6px 4px max(8px, env(safe-area-inset-bottom, 8px)) 4px',
             zIndex: 10
           }}>
             {[

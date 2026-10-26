@@ -178,7 +178,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
                   onClick={() => handleSelect(c)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <td>
+                  <td data-label="Owner / Contact">
                     <div style={{ fontWeight: 700, color: 'var(--text-dark)', fontSize: '0.92rem' }}>
                       {c.full_name || c.name}
                     </div>
@@ -207,7 +207,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
                     </div>
                   </td>
 
-                  <td>
+                  <td data-label="Vehicles">
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {c.vehicles && c.vehicles.length > 0 ? (
                         c.vehicles.map((v, idx) => (
@@ -230,7 +230,7 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
                     </div>
                   </td>
 
-                <td>
+                <td data-label="Health Score">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{
                       width: 32,
@@ -252,20 +252,20 @@ export default function CustomerDirectory({ onOpenNewCustomer, onAddCustomer, gl
                   </div>
                 </td>
 
-                <td>
+                <td data-label="Churn Risk">
                   <span className={`badge badge-${String(c.churn_risk || 'low').toLowerCase()}`}>
                     {c.churn_risk || 'Low'} Risk
                   </span>
                 </td>
 
-                <td style={{ fontWeight: 700, color: 'var(--text-dark)' }}>
+                <td data-label="Total Spent" style={{ fontWeight: 700, color: 'var(--text-dark)' }}>
                   RM {(Number(c.total_spent) || Number(c.mrr) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500 }}>
                     {c.visit_count || 1} visit(s) logged
                   </div>
                 </td>
 
-                <td style={{ textAlign: 'right' }}>
+                <td data-label="Actions" style={{ textAlign: 'right' }}>
                   <button
                     className="btn btn-secondary btn-sm"
                     onClick={(e) => { e.stopPropagation(); handleSelect(c); }}

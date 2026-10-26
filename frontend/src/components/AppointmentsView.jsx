@@ -174,8 +174,8 @@ export default function AppointmentsView({ onOpenBookingModal }) {
 
                   return (
                     <tr key={app.id}>
-                      <td style={{ fontWeight: 600, color: 'var(--text-main)' }}>{dateStr}</td>
-                      <td>
+                      <td data-label="Date & Time" style={{ fontWeight: 600, color: 'var(--text-main)' }}>{dateStr}</td>
+                      <td data-label="Customer">
                         <div style={{ fontWeight: 600 }}>{app.customer_name || 'Client'}</div>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
                           {app.customer_phone ? (
@@ -185,11 +185,11 @@ export default function AppointmentsView({ onOpenBookingModal }) {
                           ) : '-'}
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Vehicle">
                         <span className="plate-mono-tag">{app.vehicle_plate || 'NO PLATE'}</span>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>{app.vehicle_model || '-'}</div>
                       </td>
-                      <td>
+                      <td data-label="Service">
                         <div style={{ fontWeight: 500 }}>{app.service_type}</div>
                         {app.customer_notes && (
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: 220, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -197,11 +197,11 @@ export default function AppointmentsView({ onOpenBookingModal }) {
                           </div>
                         )}
                       </td>
-                      <td>
+                      <td data-label="Bay">
                         <span className="bay-badge">{app.assigned_bay || 'Bay 1'}</span>
                       </td>
-                      <td>{getStatusBadge(app.status)}</td>
-                      <td style={{ textAlign: 'right' }}>
+                      <td data-label="Status">{getStatusBadge(app.status)}</td>
+                      <td data-label="Actions" style={{ textAlign: 'right' }}>
                         <div style={{ display: 'inline-flex', gap: 6 }}>
                           {app.status === 'scheduled' && (
                             <button

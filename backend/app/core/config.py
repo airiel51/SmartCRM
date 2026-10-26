@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # Redis & Background Workers
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # Supabase Integration (Optional remote sync)
+    SUPABASE_URL: Optional[str] = None
+    SUPABASE_KEY: Optional[str] = None
+    SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
+
     # WhatsApp Business Cloud API
     WHATSAPP_PHONE_NUMBER_ID: Optional[str] = None
     WHATSAPP_BUSINESS_ACCOUNT_ID: Optional[str] = None
