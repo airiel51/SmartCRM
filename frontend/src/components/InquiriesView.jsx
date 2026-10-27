@@ -982,7 +982,7 @@ export default function InquiriesView() {
           <div className="modal-card" style={{ maxWidth: 540 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 style={{ margin: 0, fontWeight: 800 }}>Approve & Convert Inquiry to Workshop Records</h3>
-              <button className="close-btn" onClick={() => setConvertModalOpen(false)}>✕</button>
+              <button className="close-btn" aria-label="Close dialog" onClick={() => setConvertModalOpen(false)}>✕</button>
             </div>
             <form onSubmit={handleExecuteConvert} className="modal-body">
               <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: 14 }}>
@@ -1091,7 +1091,7 @@ export default function InquiriesView() {
           <div className="modal-card" style={{ maxWidth: 460 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 style={{ margin: 0, fontWeight: 800 }}>Mark Lead as Lost</h3>
-              <button className="close-btn" onClick={() => setLostModalOpen(false)}>✕</button>
+              <button className="close-btn" aria-label="Close dialog" onClick={() => setLostModalOpen(false)}>✕</button>
             </div>
             <form onSubmit={handleConfirmMarkLost} className="modal-body">
               <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: 14 }}>
@@ -1146,7 +1146,7 @@ export default function InquiriesView() {
           <div className="modal-card" style={{ maxWidth: 500 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 style={{ margin: 0, fontWeight: 800 }}>Create Manual Inbound Lead</h3>
-              <button className="close-btn" onClick={() => setManualModalOpen(false)}>✕</button>
+              <button className="close-btn" aria-label="Close dialog" onClick={() => setManualModalOpen(false)}>✕</button>
             </div>
             <form onSubmit={handleCreateManual} className="modal-body">
               <div className="form-group">

@@ -392,7 +392,7 @@ export default function SettingsView({ currentRole, onChangeRole }) {
           <div className="modal-content" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-dark)' }}>Invite Staff Member</h3>
-              <button className="btn-close" onClick={() => setAddMemberModal(false)}>✕</button>
+              <button className="btn-close" aria-label="Close dialog" onClick={() => setAddMemberModal(false)}>✕</button>
             </div>
             <form onSubmit={handleAddMember}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -450,7 +450,7 @@ export default function SettingsView({ currentRole, onChangeRole }) {
           <div className="modal-content" style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-dark)' }}>{adapterModal.title}</h3>
-              <button className="btn-close" onClick={() => setAdapterModal({ open: false, title: '', type: '' })}>✕</button>
+              <button className="btn-close" aria-label="Close dialog" onClick={() => setAdapterModal({ open: false, title: '', type: '' })}>✕</button>
             </div>
             {adapterModal.type === 'whatsapp' ? (
               <div>

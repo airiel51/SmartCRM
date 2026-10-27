@@ -58,7 +58,7 @@ export function AddCustomerModal({ isOpen, onClose, onCreated }) {
               Registers client identity, contact channels, and initial vehicle telemetry.
             </p>
           </div>
-          <button className="btn-close" onClick={onClose}>✕</button>
+          <button className="btn-close" aria-label="Close dialog" onClick={onClose}>✕</button>
         </div>
 
         {error && (
@@ -274,7 +274,7 @@ export function AddServiceModal({ isOpen, onClose, onCreated }) {
               Assign a vehicle to shop floor bay with diagnosis and cost estimate.
             </p>
           </div>
-          <button className="btn-close" onClick={onClose}>✕</button>
+          <button className="btn-close" aria-label="Close dialog" onClick={onClose}>✕</button>
         </div>
 
         {error && (

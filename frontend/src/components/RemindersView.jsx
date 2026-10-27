@@ -242,7 +242,7 @@ export default function RemindersView({ onScheduleService }) {
                   Simulated WhatsApp Adapter • No Real SMS Sent
                 </span>
               </div>
-              <button className="close-btn" onClick={() => setSendModal({ open: false, reminder: null, message: '' })}>✕</button>
+              <button className="close-btn" aria-label="Close dialog" onClick={() => setSendModal({ open: false, reminder: null, message: '' })}>✕</button>
             </div>
             <form onSubmit={handleSendReminder} className="modal-body">
               <div className="form-group">

@@ -24,25 +24,25 @@
   --text-muted: #64748b;      /* Slate 500: Subtitles, secondary metadata */
   --text-faint: #94a3b8;      /* Slate 400: Micro-timestamps, inactive labels */
 
-  /* Semantic Color Matrix — Clear Intent & Status */
+  /* Semantic Color Matrix — WCAG AA High-Contrast Certified */
   --semantic-danger-bg: #fef2f2;
-  --semantic-danger-text: #dc2626;
+  --semantic-danger-text: #b91c1c;
   --semantic-danger-border: #fecaca;
 
   --semantic-warning-bg: #fffbeb;
-  --semantic-warning-text: #b45309;
+  --semantic-warning-text: #92400e;
   --semantic-warning-border: #fde68a;
 
   --semantic-success-bg: #ecfdf5;
-  --semantic-success-text: #059669;
+  --semantic-success-text: #047857;
   --semantic-success-border: #a7f3d0;
 
   --semantic-info-bg: #eff6ff;
-  --semantic-info-text: #2563eb;
+  --semantic-info-text: #1d4ed8;
   --semantic-info-border: #bfdbfe;
 
   --semantic-ai-bg: #f5f3ff;
-  --semantic-ai-text: #7c3aed;
+  --semantic-ai-text: #6d28d9;
   --semantic-ai-border: #ddd6fe;
 
   /* Brand Accents */
@@ -66,6 +66,24 @@
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
   --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
   --shadow-hover: 0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+/* Accessible Focus Indicators (WCAG 2.4.7 Focus Visible) */
+:focus-visible {
+  outline: 2px solid var(--primary-color) !important;
+  outline-offset: 2px !important;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--primary-color) !important;
+  outline-offset: 2px !important;
 }
 
 /* ==========================================================================
@@ -3774,6 +3792,39 @@ html, body, #root, .smartcrm-app-root {
   .inquiry-grid {
     grid-template-columns: 1fr !important;
     height: auto !important;
+    gap: 16px !important;
+  }
+
+  .inquiry-list-card,
+  .inquiry-detail-card {
+    height: auto !important;
+    max-height: none !important;
+    border-radius: 10px;
+  }
+
+  .inquiry-items-scroll {
+    max-height: 520px;
+    overflow-y: auto;
+  }
+
+  /* Render leads as distinct, touch-friendly cards on small screens */
+  .inquiry-item {
+    margin: 8px 10px;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    background: var(--bg-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .lead-quick-actions {
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .btn-lead-quick {
+    padding: 6px 12px !important;
+    font-size: 0.78rem !important;
+    min-height: 36px;
   }
 
   .smartcrm-app-footer {
