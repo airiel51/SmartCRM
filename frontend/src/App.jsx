@@ -1,26 +1,60 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import Sidebar from './components/Sidebar';
-import Dashboard from './components/Dashboard';
-import CustomerDirectory from './components/CustomerDirectory';
-import VehiclesView from './components/VehiclesView';
-import AppointmentsView from './components/AppointmentsView';
-import PipelineBoard from './components/PipelineBoard';
-import InquiriesView from './components/InquiriesView';
-import RemindersView from './components/RemindersView';
-import AnalyticsView from './components/AnalyticsView';
-import AIInsightsView from './components/AIInsightsView';
-import WhatsAppLiveHub from './components/WhatsAppLiveHub';
-import FAQView from './components/FAQView';
-import SettingsView from './components/SettingsView';
-import AgenticAIChatbotWidget from './components/AgenticAIChatbotWidget';
 import FloatingContactWidget from './components/FloatingContactWidget';
 import CookieBanner from './components/CookieBanner';
-import CommandPaletteModal from './components/CommandPaletteModal';
 import ConfirmModal from './components/ConfirmModal';
 import CopyButton from './components/CopyButton';
 import ErrorBoundary from './components/ErrorBoundary';
-import { AddCustomerModal, AddServiceModal } from './components/Modals';
 import { ToastProvider } from './components/Toast';
+
+// Route-Level Code Splitting with React.lazy
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const CustomerDirectory = lazy(() => import('./components/CustomerDirectory'));
+const VehiclesView = lazy(() => import('./components/VehiclesView'));
+const AppointmentsView = lazy(() => import('./components/AppointmentsView'));
+const PipelineBoard = lazy(() => import('./components/PipelineBoard'));
+const InquiriesView = lazy(() => import('./components/InquiriesView'));
+const RemindersView = lazy(() => import('./components/RemindersView'));
+const AnalyticsView = lazy(() => import('./components/AnalyticsView'));
+const AIInsightsView = lazy(() => import('./components/AIInsightsView'));
+const WhatsAppLiveHub = lazy(() => import('./components/WhatsAppLiveHub'));
+const FAQView = lazy(() => import('./components/FAQView'));
+const SettingsView = lazy(() => import('./components/SettingsView'));
+
+// Lazy load dialog modals and widgets
+const AgenticAIChatbotWidget = lazy(() => import('./components/AgenticAIChatbotWidget'));
+const CommandPaletteModal = lazy(() => import('./components/CommandPaletteModal'));
+const AddCustomerModal = lazy(() => import('./components/Modals').then(m => ({ default: m.AddCustomerModal })));
+const AddServiceModal = lazy(() => import('./components/Modals').then(m => ({ default: m.AddServiceModal })));
+
+function ViewLoadingSkeleton() {
+  return (
+    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div>
+          <div className="skeleton-line lg" style={{ width: 240, height: 28, marginBottom: 8 }} />
+          <div className="skeleton-line sm" style={{ width: 380, height: 16 }} />
+        </div>
+        <div className="skeleton-line sm" style={{ width: 120, height: 36, borderRadius: 6 }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
+        {[1, 2, 3, 4].map(n => (
+          <div key={n} style={{ background: 'var(--bg-card)', padding: 18, borderRadius: 10, border: '1px solid var(--border-color)' }}>
+            <div className="skeleton-line xs" style={{ width: '60%', marginBottom: 10 }} />
+            <div className="skeleton-line md" style={{ width: '40%', height: 24, marginBottom: 6 }} />
+            <div className="skeleton-line xs" style={{ width: '80%' }} />
+          </div>
+        ))}
+      </div>
+      <div style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 10, border: '1px solid var(--border-color)', minHeight: 280 }}>
+        <div className="skeleton-line sm" style={{ width: '30%', marginBottom: 16 }} />
+        <div className="skeleton-line sm" style={{ width: '90%', marginBottom: 10 }} />
+        <div className="skeleton-line sm" style={{ width: '75%', marginBottom: 10 }} />
+        <div className="skeleton-line sm" style={{ width: '85%' }} />
+      </div>
+    </div>
+  );
+}
 
 const VIEW_TITLES = {
   overview: 'Workshop Overview',
@@ -40,13 +74,33 @@ const VIEW_TITLES = {
 
 const VALID_VIEWS = Object.keys(VIEW_TITLES);
 
+const getViewFromPath = () => {
+  try {
+    if (typeof window === 'undefined') return 'overview';
+    if (window.location.hash) {
+      const hashView = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0];
+      if (VALID_VIEWS.includes(hashView)) return hashView;
+    }
+    const path = window.location.pathname
+      .replace(/^\/SmartCRM\/?/i, '')
+      .replace(/^\//, '')
+      .split('/')[0];
+    if (path && VALID_VIEWS.includes(path)) {
+      return path;
+    }
+  } catch (err) {
+    console.warn('Path resolution error:', err);
+  }
+  return 'overview';
+};
+
 const formatTimestamp = () => {
   const d = new Date();
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('overview');
+  const [currentView, setCurrentView] = useState(getViewFromPath);
   const [currentRole, setCurrentRole] = useState('owner'); // 'owner', 'pic', 'technician'
   const [globalSearch, setGlobalSearch] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -166,6 +220,15 @@ export default function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
+  // Listen to browser Back/Forward buttons (popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentView(getViewFromPath());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleNavigate = (view) => {
     if (view === 'OPEN_SEARCH') {
       setIsSearchPaletteOpen(true);
@@ -173,6 +236,16 @@ export default function App() {
     }
     setCurrentView(view);
     setIsMobileMenuOpen(false);
+    try {
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+      const targetPath = view === 'overview' ? cleanBase : `${cleanBase}${view}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ view }, '', targetPath);
+      }
+    } catch (e) {
+      console.warn('History pushState error:', e);
+    }
     // Scroll view back to top on navigation
     if (contentAreaRef.current) {
       contentAreaRef.current.scrollTop = 0;
@@ -295,6 +368,12 @@ export default function App() {
                 </kbd>
               </div>
 
+              {/* Persistent Demo Data Badge */}
+              <div className="demo-data-badge" title="Workshop simulation active: all telemetry, work orders, and chats are demo data">
+                <span className="demo-data-pulse" aria-hidden="true"></span>
+                <span>Demo Data</span>
+              </div>
+
               {/* Dynamic Last Updated Badge */}
               <div className="last-updated-badge" title="Live telemetry sync timestamp">
                 <span className="last-updated-dot"></span>
@@ -362,12 +441,13 @@ export default function App() {
             tabIndex="-1"
           >
             <ErrorBoundary fallbackTitle="Workshop Module Intercepted" onReset={() => handleNavigate('overview')}>
-              {(currentView === 'overview' || currentView === 'dashboard') && (
-                <Dashboard
-                  onNavigateView={handleNavigate}
-                  onSelectCustomer={setSelectedCustomer}
-                />
-              )}
+              <Suspense fallback={<ViewLoadingSkeleton />}>
+                {(currentView === 'overview' || currentView === 'dashboard') && (
+                  <Dashboard
+                    onNavigateView={handleNavigate}
+                    onSelectCustomer={setSelectedCustomer}
+                  />
+                )}
 
               {currentView === 'customers' && (
                 <CustomerDirectory
@@ -433,6 +513,7 @@ export default function App() {
                   onChangeRole={setCurrentRole}
                 />
               )}
+            </Suspense>
 
               {/* Custom 404 Fallback Page */}
               {!VALID_VIEWS.includes(currentView) && (
@@ -471,6 +552,7 @@ export default function App() {
           <footer className="smartcrm-app-footer">
             <div className="footer-left">
               <span>© {new Date().getFullYear()} SmartCRM Workshop OS • Apex AutoWorks (Bayan Lepas, Penang) • All rights reserved.</span>
+              <span className="footer-demo-badge">Demo Data Active</span>
             </div>
             <div className="footer-right">
               <a href="tel:+60123456789" className="footer-contact-link" title="Call Workshop Support">
@@ -488,7 +570,9 @@ export default function App() {
         <FloatingContactWidget />
 
         {/* Floating Agentic AI Copilot Chatbot */}
-        <AgenticAIChatbotWidget onNavigateTab={handleNavigate} />
+        <Suspense fallback={null}>
+          <AgenticAIChatbotWidget onNavigateTab={handleNavigate} />
+        </Suspense>
 
         {/* GDPR / Malaysian PDPA Cookie Consent Banner */}
         <CookieBanner />
@@ -516,20 +600,24 @@ export default function App() {
         </nav>
 
         {/* Global Command Palette / Site Search Modal (Ctrl+K) */}
-        <CommandPaletteModal
-          isOpen={isSearchPaletteOpen}
-          onClose={() => setIsSearchPaletteOpen(false)}
-          onNavigate={(view) => {
-            handleNavigate(view);
-            setIsSearchPaletteOpen(false);
-          }}
-          onTriggerAction={(action) => {
-            setIsSearchPaletteOpen(false);
-            if (action === 'intake') setIsIntakeModalOpen(true);
-            if (action === 'service') setIsServiceModalOpen(true);
-            if (action === 'toggle_menu') handleToggleMenu();
-          }}
-        />
+        {isSearchPaletteOpen && (
+          <Suspense fallback={null}>
+            <CommandPaletteModal
+              isOpen={isSearchPaletteOpen}
+              onClose={() => setIsSearchPaletteOpen(false)}
+              onNavigate={(view) => {
+                handleNavigate(view);
+                setIsSearchPaletteOpen(false);
+              }}
+              onTriggerAction={(action) => {
+                setIsSearchPaletteOpen(false);
+                if (action === 'intake') setIsIntakeModalOpen(true);
+                if (action === 'service') setIsServiceModalOpen(true);
+                if (action === 'toggle_menu') handleToggleMenu();
+              }}
+            />
+          </Suspense>
+        )}
 
         {/* Action Confirmation Modal */}
         <ConfirmModal
@@ -548,17 +636,21 @@ export default function App() {
 
         {/* Global Modals */}
         {isIntakeModalOpen && (
-          <AddCustomerModal
-            isOpen={isIntakeModalOpen}
-            onClose={() => setIsIntakeModalOpen(false)}
-          />
+          <Suspense fallback={null}>
+            <AddCustomerModal
+              isOpen={isIntakeModalOpen}
+              onClose={() => setIsIntakeModalOpen(false)}
+            />
+          </Suspense>
         )}
 
         {isServiceModalOpen && (
-          <AddServiceModal
-            isOpen={isServiceModalOpen}
-            onClose={() => setIsServiceModalOpen(false)}
-          />
+          <Suspense fallback={null}>
+            <AddServiceModal
+              isOpen={isServiceModalOpen}
+              onClose={() => setIsServiceModalOpen(false)}
+            />
+          </Suspense>
         )}
       </div>
     </ToastProvider>

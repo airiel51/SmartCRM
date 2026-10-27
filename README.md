@@ -68,6 +68,10 @@ SmartCRM is an intelligent, domain-specific Customer Relationship Management sys
   - Pre-drafted automated WhatsApp confirmation message.
 - 1-Click **"Convert into Confirmed Workshop Booking"** automatically registers customer, vehicle, and work order in Kanban!
 
+> [!IMPORTANT]
+> **API Security Boundary & WhatsApp Cloud API Credentials**:
+> All production WhatsApp Cloud API requests (Meta Graph API) must strictly be executed through the Python FastAPI backend service (`backend/app/services/whatsapp.py`). Production access tokens (`WHATSAPP_TOKEN`), phone number IDs (`WHATSAPP_PHONE_ID`), and webhook verification secrets must be stored securely in backend environment variables (`.env`) or cloud key vaults—never in client-side bundles or browser storage. The frontend settings interface provides a demonstration sandbox and clearly prohibits entering real production credentials.
+
 ### 🔧 Service Bays & Work Order Kanban (`/services`, `/pipeline`)
 - 6 Automotive Stages:
   1. `Inquiry`: Chat Inquiries & Quotes

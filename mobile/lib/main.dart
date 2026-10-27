@@ -20,11 +20,11 @@ class ApexAutoWorksApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-        primaryColor: const Color(0xFFF59E0B),
+        primaryColor: const Color(0xFF0F172A),
         cardColor: Colors.white,
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFFF59E0B),
-          secondary: Color(0xFF1E293B),
+          primary: Color(0xFF0F172A),
+          secondary: Color(0xFF475569),
           surface: Colors.white,
         ),
         fontFamily: 'Inter',

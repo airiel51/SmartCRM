@@ -306,7 +306,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
                           });
                         },
                         style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 20)),
-                        child: const Text('All OK', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                        child: const Text('All OK', style: TextStyle(color: Color(0xFF166534), fontSize: 11, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -335,14 +335,15 @@ class _IntakeScreenState extends State<IntakeScreen> {
               child: ElevatedButton.icon(
                 onPressed: _isSubmitting ? null : _submitIntake,
                 icon: _isSubmitting
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
-                    : const Icon(Icons.check_circle_rounded, color: Colors.black87),
+                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Icon(Icons.check_circle_rounded, color: Colors.white),
                 label: Text(
                   _isSubmitting ? 'Checking In...' : 'Check In to $_selectedBay',
-                  style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 15),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
+                  backgroundColor: const Color(0xFF0F172A),
+                  elevation: 2,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
@@ -361,22 +362,22 @@ class _IntakeScreenState extends State<IntakeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
         decoration: BoxDecoration(
-          color: isOk ? Colors.green.withOpacity(0.15) : Colors.red.withOpacity(0.15),
+          color: isOk ? const Color(0xFFF0FDF4) : const Color(0xFFFEF2F2),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isOk ? Colors.greenAccent.shade400 : Colors.redAccent,
+            color: isOk ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA),
             width: 1,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(isOk ? Icons.check_circle_rounded : Icons.cancel_rounded, size: 14, color: isOk ? Colors.greenAccent : Colors.redAccent),
+            Icon(isOk ? Icons.check_circle_rounded : Icons.cancel_rounded, size: 14, color: isOk ? const Color(0xFF166534) : const Color(0xFF991B1B)),
             const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
-                color: isOk ? Colors.white : Colors.redAccent,
+                color: isOk ? const Color(0xFF166534) : const Color(0xFF991B1B),
                 fontSize: 12,
                 fontWeight: isOk ? FontWeight.w500 : FontWeight.bold,
               ),

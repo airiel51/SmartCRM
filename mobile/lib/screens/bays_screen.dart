@@ -122,11 +122,11 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
             ),
             Row(
               children: [
-                const PulsingDot(color: Color(0xFFD97706), size: 5),
+                const PulsingDot(color: Color(0xFF475569), size: 5),
                 const SizedBox(width: 5),
                 Text(
                   '$occupiedCount of 4 bays active',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF475569), fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -140,14 +140,14 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFF59E0B)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF0F172A)))
           : RefreshIndicator(
               onRefresh: _loadServices,
-              color: const Color(0xFFF59E0B),
+              color: const Color(0xFF0F172A),
               child: FadeTransition(
                 opacity: _fadeCtrl,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
                   itemCount: allBays.length,
                   itemBuilder: (context, idx) {
                     final bayName = allBays[idx];
@@ -191,35 +191,35 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
     } else {
       switch (s.stage) {
         case 'Scheduled':
-          badgeBg = const Color(0xFFF3E8FF);
-          badgeText = const Color(0xFF7C3AED);
-          dotColor = const Color(0xFF8B5CF6);
+          badgeBg = const Color(0xFFF1F5F9);
+          badgeText = const Color(0xFF334155);
+          dotColor = const Color(0xFF475569);
           statusLabel = 'Scheduled';
           currentStep = 1;
           break;
         case 'In Progress':
-          badgeBg = const Color(0xFFFEF3C7);
-          badgeText = const Color(0xFFD97706);
-          dotColor = const Color(0xFFF59E0B);
+          badgeBg = const Color(0xFFF1F5F9);
+          badgeText = const Color(0xFF334155);
+          dotColor = const Color(0xFF475569);
           statusLabel = 'In Service';
           currentStep = 2;
           break;
         case 'Quality Inspection':
-          badgeBg = const Color(0xFFEFF6FF);
-          badgeText = const Color(0xFF2563EB);
-          dotColor = const Color(0xFF3B82F6);
+          badgeBg = const Color(0xFFF8FAFC);
+          badgeText = const Color(0xFF334155);
+          dotColor = const Color(0xFF64748B);
           statusLabel = 'Final Check';
           currentStep = 3;
           break;
         case 'Ready for Pickup':
-          badgeBg = const Color(0xFFECFDF5);
-          badgeText = const Color(0xFF059669);
-          dotColor = const Color(0xFF10B981);
+          badgeBg = const Color(0xFFF0FDF4);
+          badgeText = const Color(0xFF166534);
+          dotColor = const Color(0xFF22C55E);
           statusLabel = 'Ready';
           currentStep = 4;
           break;
         default:
-          badgeBg = const Color(0xFFF1F5F9);
+          badgeBg = const Color(0xFFF8FAFC);
           badgeText = const Color(0xFF64748B);
           dotColor = const Color(0xFF94A3B8);
           statusLabel = 'Waiting';
@@ -258,12 +258,12 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
                     Container(
                       padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
-                        color: isOccupied ? const Color(0xFFFEF3C7) : const Color(0xFFF1F5F9),
+                        color: isOccupied ? const Color(0xFFF1F5F9) : const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.car_repair_rounded,
-                        color: isOccupied ? const Color(0xFFD97706) : const Color(0xFF94A3B8),
+                        color: isOccupied ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
                         size: 18,
                       ),
                     ),
@@ -324,11 +324,11 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.add_circle_outline_rounded, color: Color(0xFFD97706), size: 18),
+                      const Icon(Icons.add_circle_outline_rounded, color: Color(0xFF0F172A), size: 18),
                       const SizedBox(width: 8),
                       Text(
                         'Assign Car to $bayName',
-                        style: const TextStyle(color: Color(0xFFD97706), fontWeight: FontWeight.bold, fontSize: 13),
+                        style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ],
                   ),
@@ -403,16 +403,16 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981),
+                            color: const Color(0xFF0F172A),
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
-                              BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, 2)),
                             ],
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: const [
-                              Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
+                              Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF22C55E), size: 16),
                               SizedBox(width: 6),
                               Text('WhatsApp Customer', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                             ],
@@ -447,13 +447,13 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: s.stage == 'In Progress' ? const Color(0xFF2563EB) : const Color(0xFFF59E0B),
+                      color: const Color(0xFF0F172A),
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
-                          color: (s.stage == 'In Progress' ? const Color(0xFF2563EB) : const Color(0xFFF59E0B)).withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+                          color: Colors.black.withValues(alpha: 0.10),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
@@ -464,9 +464,9 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
                             : s.stage == 'In Progress'
                                 ? 'Move to Final Check ➔'
                                 : 'Mark Ready for Pickup ➔',
-                        style: TextStyle(
-                          color: s.stage == 'In Progress' ? Colors.white : const Color(0xFF0F172A),
-                          fontWeight: FontWeight.w900,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
                       ),
@@ -495,7 +495,7 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
                 child: Container(
                   height: 3.5,
                   decoration: BoxDecoration(
-                    color: isPassed ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
+                    color: isPassed ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -506,7 +506,7 @@ class _BaysScreenState extends State<BaysScreen> with SingleTickerProviderStateM
                   height: 6,
                   margin: const EdgeInsets.symmetric(horizontal: 2),
                   decoration: BoxDecoration(
-                    color: isPassed ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
+                    color: isPassed ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
                     shape: BoxShape.circle,
                   ),
                 ),
