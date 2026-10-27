@@ -40,5 +40,5 @@ Thumbs.db
 
 # Temporary workspace screenshots & emulator scripts
 /*.png
-/launch_emulator.bat
+/*.bat
 
