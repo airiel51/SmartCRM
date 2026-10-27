@@ -517,33 +517,172 @@ const MOCK_FALLBACK = {
   inquiries: [
     {
       id: "inq-1",
+      sender_name: "Daniel Lim",
       customer_name: "Daniel Lim",
+      sender_phone: "+60 18-992 1104",
       phone: "+60 18-992 1104",
-      plate_number: "PNG 4419",
-      vehicle_summary: "Honda Civic RS 1.5 Turbo",
-      raw_message: "Hi boss, my Honda Civic PNG 4419 brake pedal feels spongy when coming to a stop. Can I drop it by Bayan Lepas workshop tomorrow at 2:30pm for brake check?",
+      email: "daniel.lim@gmail.com",
+      channel: "whatsapp",
       status: "new",
-      created_at: new Date(Date.now() - 3600000).toISOString()
+      assigned_to: "Sarah Tan (PIC)",
+      created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+      raw_message: "Hi boss, my Honda Civic PNG 4419 brake pedal feels spongy when coming to a stop. Can I drop it by Bayan Lepas workshop tomorrow at 2:30pm for brake check?",
+      extraction_confidence: 0.94,
+      extraction_provider: "gemini-2.5-flash",
+      extracted_data: {
+        customer_name: "Daniel Lim",
+        phone: "+60 18-992 1104",
+        plate_number: "PNG 4419",
+        make: "Honda",
+        model: "Civic RS 1.5 Turbo",
+        year: 2022,
+        symptoms: ["Spongy brake pedal", "Excessive pedal travel", "Hydraulic pressure loss"],
+        requested_service: "Brake Master Cylinder & Fluid Flush",
+        estimated_cost: 280.0,
+        preferred_date: "Tomorrow",
+        preferred_time: "2:30 PM"
+      }
     },
     {
       id: "inq-2",
-      customer_name: "Siti Sarah",
-      phone: "+60 13-445 6781",
-      plate_number: "WXY 8821",
-      vehicle_summary: "Perodua Myvi 1.5 AV",
-      raw_message: "Salam Apex AutoWorks, my Perodua Myvi WXY 8821 aircond is blowing warm air at noon. How much to check gas and flush cooling coil?",
+      sender_name: "Ahmad Zaki",
+      customer_name: "Ahmad Zaki",
+      sender_phone: "+60 12-883 4901",
+      phone: "+60 12-883 4901",
+      email: "ahmad.zaki@outlook.my",
+      channel: "whatsapp",
       status: "new",
-      created_at: new Date(Date.now() - 7200000).toISOString()
+      assigned_to: "Unassigned",
+      created_at: new Date(Date.now() - 29 * 3600 * 1000).toISOString(),
+      raw_message: "Salam bro, Proton Saga BLM plate PKD 5512 steering vibrates violently when cruising above 80 km/h on highway. Need alignment quotation urgently.",
+      extraction_confidence: 0.89,
+      extraction_provider: "gemini-2.5-flash",
+      extracted_data: {
+        customer_name: "Ahmad Zaki",
+        phone: "+60 12-883 4901",
+        plate_number: "PKD 5512",
+        make: "Proton",
+        model: "Saga BLM 1.3",
+        year: 2018,
+        symptoms: ["Steering wheel high-speed vibration", "Highway oscillation", "Wheel imbalance"],
+        requested_service: "4-Wheel High-Speed Balancing & Alignment",
+        estimated_cost: 120.0,
+        preferred_date: "Urgent (>24h Waiting)",
+        preferred_time: "Morning Slot"
+      }
     },
     {
       id: "inq-3",
-      customer_name: "Mr. Rajendran",
-      phone: "+60 19-332 0918",
-      plate_number: "JRS 7731",
-      vehicle_summary: "Toyota Vios 1.5G",
-      raw_message: "Hello, looking for urgent check engine diagnostic for Toyota Vios plate JRS 7731. Engine idling rough.",
-      status: "in_review",
-      created_at: new Date(Date.now() - 14400000).toISOString()
+      sender_name: "Siti Sarah",
+      customer_name: "Siti Sarah",
+      sender_phone: "+60 13-445 6781",
+      phone: "+60 13-445 6781",
+      email: "siti.sarah@yahoo.com",
+      channel: "walk_in",
+      status: "contacted",
+      assigned_to: "Sarah Tan (PIC)",
+      created_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
+      raw_message: "Customer walked into service counter: Perodua Myvi WXY 8821 aircond is blowing warm air at noon. Inquired about gas pressure check and cooling coil flush.",
+      extraction_confidence: 0.96,
+      extraction_provider: "rules_fallback",
+      extracted_data: {
+        customer_name: "Siti Sarah",
+        phone: "+60 13-445 6781",
+        plate_number: "WXY 8821",
+        make: "Perodua",
+        model: "Myvi 1.5 AV",
+        year: 2021,
+        symptoms: ["Air conditioner blowing ambient warm air", "No refrigerant chill at idle"],
+        requested_service: "AC Evaporator Leak Test & R134a Gas Recharge",
+        estimated_cost: 220.0,
+        preferred_date: "Saturday",
+        preferred_time: "10:00 AM"
+      }
+    },
+    {
+      id: "inq-4",
+      sender_name: "Marcus Wong",
+      customer_name: "Marcus Wong",
+      sender_phone: "+60 17-210 9382",
+      phone: "+60 17-210 9382",
+      email: "marcus.wong@techcorp.com",
+      channel: "web",
+      status: "quoted",
+      assigned_to: "Hakim Danial (Tech)",
+      created_at: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
+      raw_message: "Web Intake Form: BMW 320i plate PLQ 9002 dashboard displaying brake pad wear indicator warning. Quoted Brembo low-dust ceramic pads + sensor replacement.",
+      extraction_confidence: 0.98,
+      extraction_provider: "gemini-2.5-flash",
+      extracted_data: {
+        customer_name: "Marcus Wong",
+        phone: "+60 17-210 9382",
+        plate_number: "PLQ 9002",
+        make: "BMW",
+        model: "320i Sport (F30)",
+        year: 2020,
+        symptoms: ["Brake pad wear sensor warning light active", "Rotor lip grooving"],
+        requested_service: "Brembo Front Ceramic Brake Pads & Electronic Sensor",
+        estimated_cost: 650.0,
+        preferred_date: "Thursday",
+        preferred_time: "11:00 AM"
+      }
+    },
+    {
+      id: "inq-5",
+      sender_name: "Priya Subramaniam",
+      customer_name: "Priya Subramaniam",
+      sender_phone: "+60 16-554 2190",
+      phone: "+60 16-554 2190",
+      email: "priya.subra@yahoo.com",
+      channel: "whatsapp",
+      status: "booked",
+      assigned_to: "Airiel Hazim (Owner)",
+      created_at: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+      raw_message: "Booking confirmed: Proton X50 plate VAB 2020 scheduled for 20,000 km minor service & brake inspection in Bay 1.",
+      extraction_confidence: 0.99,
+      extraction_provider: "gemini-2.5-flash",
+      extracted_data: {
+        customer_name: "Priya Subramaniam",
+        phone: "+60 16-554 2190",
+        plate_number: "VAB 2020",
+        make: "Proton",
+        model: "X50 1.5 TGDi",
+        year: 2023,
+        symptoms: ["Scheduled 20,000 km oil & filter change", "Tire pressure inspection"],
+        requested_service: "Fully Synthetic Oil Change + Multipoint Check",
+        estimated_cost: 320.0,
+        preferred_date: "Tomorrow",
+        preferred_time: "9:00 AM"
+      }
+    },
+    {
+      id: "inq-6",
+      sender_name: "Tan Boon Hock",
+      customer_name: "Tan Boon Hock",
+      sender_phone: "+60 11-1928 3401",
+      phone: "+60 11-1928 3401",
+      email: "boonhock.tan@gmail.com",
+      channel: "phone",
+      status: "lost",
+      lost_reason: "Price quote higher than competitor (opted for OEM reconditioned part elsewhere)",
+      assigned_to: "Sarah Tan (PIC)",
+      created_at: new Date(Date.now() - 72 * 3600 * 1000).toISOString(),
+      raw_message: "Phone inquiry: Nissan Almera plate PKA 4102 requested quote for alternator replacement. Customer decided to purchase used unit independently.",
+      extraction_confidence: 0.91,
+      extraction_provider: "rules_fallback",
+      extracted_data: {
+        customer_name: "Tan Boon Hock",
+        phone: "+60 11-1928 3401",
+        plate_number: "PKA 4102",
+        make: "Nissan",
+        model: "Almera 1.5E",
+        year: 2017,
+        symptoms: ["Battery discharge warning", "Dimming headlights at idle"],
+        requested_service: "Alternator Assembly Replacement",
+        estimated_cost: 580.0,
+        preferred_date: "Flexible",
+        preferred_time: "Morning"
+      }
     }
   ],
   recommendations: [
@@ -904,10 +1043,67 @@ export const api = {
     let q = status ? `?status=${encodeURIComponent(status)}` : '';
     return fetchWithFallback(`/inquiries${q}`, {}, 'inquiries');
   },
-  createInquiry: (data) =>
-    fetchWithFallback(`/inquiries`, { method: 'POST', body: JSON.stringify(data) }),
-  convertInquiry: (id, data) =>
-    fetchWithFallback(`/inquiries/${id}/convert`, { method: 'POST', body: JSON.stringify(data) }),
+  createInquiry: async (data) => {
+    try {
+      return await fetchWithFallback(`/inquiries`, { method: 'POST', body: JSON.stringify(data) });
+    } catch {
+      // Standalone demo fallback
+      const plateMatch = (data.raw_message || '').match(/\b([A-Z]{1,3}\s*\d{1,4}\s*[A-Z]?)\b/i);
+      const newInq = {
+        id: `inq-${Date.now()}`,
+        sender_name: data.sender_name || 'Inbound Lead',
+        customer_name: data.sender_name || 'Inbound Lead',
+        sender_phone: data.sender_phone || '+60 12-000 0000',
+        phone: data.sender_phone || '+60 12-000 0000',
+        email: data.email || 'customer@example.com',
+        channel: data.channel || 'whatsapp',
+        status: 'new',
+        assigned_to: 'Sarah Tan (PIC)',
+        created_at: new Date().toISOString(),
+        raw_message: data.raw_message || '',
+        extraction_confidence: 0.93,
+        extraction_provider: 'gemini-2.5-flash',
+        extracted_data: {
+          customer_name: data.sender_name || 'Inbound Lead',
+          phone: data.sender_phone || '+60 12-000 0000',
+          plate_number: plateMatch ? plateMatch[1].toUpperCase() : 'WXY 8821',
+          make: 'Proton',
+          model: 'X50',
+          year: 2022,
+          symptoms: ['Reported mechanical vibration and brake noise'],
+          requested_service: 'Workshop Diagnostic Inspection',
+          estimated_cost: 180.0,
+          preferred_date: 'Flexible',
+          preferred_time: 'Afternoon'
+        }
+      };
+      MOCK_FALLBACK.inquiries.unshift(newInq);
+      return newInq;
+    }
+  },
+  convertInquiry: async (id, data) => {
+    try {
+      return await fetchWithFallback(`/inquiries/${id}/convert`, { method: 'POST', body: JSON.stringify(data) });
+    } catch {
+      const found = MOCK_FALLBACK.inquiries.find(i => i.id === id);
+      if (found) {
+        found.status = 'booked';
+        if (data.assigned_bay) found.assigned_bay = data.assigned_bay;
+      }
+      return { success: true, message: 'Inquiry converted to records (Demo)' };
+    }
+  },
+  updateInquiry: async (id, data) => {
+    try {
+      return await fetchWithFallback(`/inquiries/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+    } catch {
+      const found = MOCK_FALLBACK.inquiries.find(i => i.id === id);
+      if (found) {
+        Object.assign(found, data);
+      }
+      return { success: true, inquiry: found };
+    }
+  },
 
   // 13. Service Reminders
   getReminders: (status = '') => {
