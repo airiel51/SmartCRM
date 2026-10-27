@@ -1,7 +1,15 @@
 // API Client for SmartCRM Backend (FastAPI + Supabase)
 // CAT405 Intelligent Computing Major Project
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return `http://${window.location.hostname}:8000/api/v1`;
+  }
+  return 'http://localhost:8000/api/v1';
+};
+
+const API_BASE = getApiBase();
 
 
 // Dynamic / Lazy Mock Dataset Loading
