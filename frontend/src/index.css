@@ -684,6 +684,60 @@ html, body {
   font-weight: 700;
 }
 
+.demo-data-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .demo-data-badge {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.demo-data-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  animation: demo-pulse-anim 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes demo-pulse-anim {
+  to {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+}
+
+.footer-demo-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 7px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+  border-radius: 4px;
+  font-size: 0.70rem;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .footer-demo-badge {
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;

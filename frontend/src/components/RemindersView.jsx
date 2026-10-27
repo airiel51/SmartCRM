@@ -283,7 +283,7 @@ export default function RemindersView({ onScheduleService }) {
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary btn-sm" disabled={actionLoading}>
-                  {actionLoading ? 'Dispatching...' : 'Dispatch Simulated WhatsApp'}
+                  {actionLoading ? 'Simulating...' : 'Simulate WhatsApp Notification (Demo)'}
                 </button>
               </div>
             </form>

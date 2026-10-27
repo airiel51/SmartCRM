@@ -334,6 +334,12 @@ export default function App() {
                 </kbd>
               </div>
 
+              {/* Persistent Demo Data Badge */}
+              <div className="demo-data-badge" title="Workshop simulation active: all telemetry, work orders, and chats are demo data">
+                <span className="demo-data-pulse" aria-hidden="true"></span>
+                <span>Demo Data</span>
+              </div>
+
               {/* Dynamic Last Updated Badge */}
               <div className="last-updated-badge" title="Live telemetry sync timestamp">
                 <span className="last-updated-dot"></span>
@@ -510,6 +516,7 @@ export default function App() {
           <footer className="smartcrm-app-footer">
             <div className="footer-left">
               <span>© {new Date().getFullYear()} SmartCRM Workshop OS • Apex AutoWorks (Bayan Lepas, Penang) • All rights reserved.</span>
+              <span className="footer-demo-badge">Demo Data Active</span>
             </div>
             <div className="footer-right">
               <a href="tel:+60123456789" className="footer-contact-link" title="Call Workshop Support">
