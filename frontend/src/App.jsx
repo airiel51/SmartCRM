@@ -40,13 +40,33 @@ const VIEW_TITLES = {
 
 const VALID_VIEWS = Object.keys(VIEW_TITLES);
 
+const getViewFromPath = () => {
+  try {
+    if (typeof window === 'undefined') return 'overview';
+    if (window.location.hash) {
+      const hashView = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0];
+      if (VALID_VIEWS.includes(hashView)) return hashView;
+    }
+    const path = window.location.pathname
+      .replace(/^\/SmartCRM\/?/i, '')
+      .replace(/^\//, '')
+      .split('/')[0];
+    if (path && VALID_VIEWS.includes(path)) {
+      return path;
+    }
+  } catch (err) {
+    console.warn('Path resolution error:', err);
+  }
+  return 'overview';
+};
+
 const formatTimestamp = () => {
   const d = new Date();
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('overview');
+  const [currentView, setCurrentView] = useState(getViewFromPath);
   const [currentRole, setCurrentRole] = useState('owner'); // 'owner', 'pic', 'technician'
   const [globalSearch, setGlobalSearch] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -166,6 +186,15 @@ export default function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
+  // Listen to browser Back/Forward buttons (popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentView(getViewFromPath());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleNavigate = (view) => {
     if (view === 'OPEN_SEARCH') {
       setIsSearchPaletteOpen(true);
@@ -173,6 +202,16 @@ export default function App() {
     }
     setCurrentView(view);
     setIsMobileMenuOpen(false);
+    try {
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+      const targetPath = view === 'overview' ? cleanBase : `${cleanBase}${view}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ view }, '', targetPath);
+      }
+    } catch (e) {
+      console.warn('History pushState error:', e);
+    }
     // Scroll view back to top on navigation
     if (contentAreaRef.current) {
       contentAreaRef.current.scrollTop = 0;
