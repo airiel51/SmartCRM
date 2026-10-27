@@ -38,7 +38,7 @@ export default function SettingsView({ currentRole, onChangeRole }) {
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [newMemberForm, setNewMemberForm] = useState({ name: '', email: '', role: 'technician' });
   const [adapterModal, setAdapterModal] = useState({ open: false, title: '', type: '' });
-  const [whatsappToken, setWhatsappToken] = useState('EAAGm0PX4ZCBO1234567890abcdef');
+  const [whatsappToken, setWhatsappToken] = useState('');
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
@@ -459,22 +459,25 @@ export default function SettingsView({ currentRole, onChangeRole }) {
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <div>
-                    <label className="form-label">Phone Number ID</label>
-                    <input type="text" className="form-input" defaultValue="109283748291029" />
+                    <label className="form-label">Phone Number ID (Demo)</label>
+                    <input type="text" className="form-input" placeholder="e.g. 109283748291029" />
                   </div>
                   <div>
                     <PasswordInput
                       id="meta-whatsapp-token"
-                      label="Cloud API Access Token"
+                      label="Cloud API Access Token (Demo only, do not enter real credentials)"
                       value={whatsappToken}
                       onChange={(e) => setWhatsappToken(e.target.value)}
-                      placeholder="EAAGm..."
+                      placeholder="Paste simulation token here..."
                       required
                       isValid={whatsappToken.length >= 16}
                       isInvalid={whatsappToken.length > 0 && whatsappToken.length < 16}
                       errorMessage="Access token must be at least 16 characters long."
                       successMessage="Valid Meta Graph API authorization token format."
                     />
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.4 }}>
+                      ⚠️ <strong>Demo only, do not enter real credentials.</strong> Real Meta WhatsApp Cloud API credentials must be secured in server environment variables on the backend, never in client-side code.
+                    </div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
