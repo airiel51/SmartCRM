@@ -4311,23 +4311,23 @@ table th,
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #2563eb;
+  background: #0f172a;
   color: #ffffff;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
   padding: 10px 18px;
   font-weight: 700;
   font-size: 0.85rem;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
 .floating-contact-fab:hover {
-  background: #1d4ed8;
+  background: #1e293b;
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
 }
 
 .floating-contact-fab.active {
@@ -4990,11 +4990,11 @@ table th,
 }
 
 .mobile-bottom-nav-item.active {
-  color: #f59e0b;
+  color: #f8fafc;
 }
 
 .mobile-bottom-nav-item.active .nav-icon {
-  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
+  filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.25));
 }
 
 .mobile-bottom-nav-item .nav-icon {

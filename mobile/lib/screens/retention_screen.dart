@@ -74,11 +74,11 @@ class _RetentionScreenState extends State<RetentionScreen> {
             ),
             Row(
               children: [
-                const PulsingDot(color: Color(0xFFDC2626), size: 5),
+                const PulsingDot(color: Color(0xFF991B1B), size: 5),
                 const SizedBox(width: 5),
                 Text(
                   '${_alerts.length} vehicles due for service',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFFDC2626), fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF991B1B), fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -92,10 +92,10 @@ class _RetentionScreenState extends State<RetentionScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFF59E0B)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF0F172A)))
           : RefreshIndicator(
               onRefresh: _loadAlerts,
-              color: const Color(0xFFF59E0B),
+              color: const Color(0xFF0F172A),
               child: _alerts.isEmpty
                   ? const Center(
                       child: Text(
@@ -104,7 +104,7 @@ class _RetentionScreenState extends State<RetentionScreen> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
                       itemCount: _alerts.length,
                       itemBuilder: (context, idx) {
                         final item = _alerts[idx];
@@ -168,17 +168,17 @@ class _RetentionScreenState extends State<RetentionScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFEE2E2),
+                      color: const Color(0xFFFEF2F2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const PulsingDot(color: Color(0xFFDC2626), size: 4),
+                        const PulsingDot(color: Color(0xFF991B1B), size: 4),
                         const SizedBox(width: 4),
                         Text(
                           '${alert.daysOverdue}d overdue',
-                          style: const TextStyle(color: Color(0xFFDC2626), fontSize: 11, fontWeight: FontWeight.w800),
+                          style: const TextStyle(color: Color(0xFF991B1B), fontSize: 11, fontWeight: FontWeight.w800),
                         ),
                       ],
                     ),
@@ -221,16 +221,16 @@ class _RetentionScreenState extends State<RetentionScreen> {
                   width: double.infinity,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981),
+                    color: const Color(0xFF0F172A),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
-                      BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, 2)),
                     ],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(Icons.chat_rounded, color: Colors.white, size: 16),
+                      Icon(Icons.chat_rounded, color: Color(0xFF22C55E), size: 16),
                       SizedBox(width: 6),
                       Text(
                         'Send WhatsApp Reminder',

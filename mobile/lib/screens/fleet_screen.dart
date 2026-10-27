@@ -62,7 +62,7 @@ class _FleetScreenState extends State<FleetScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFF59E0B)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF0F172A)))
           : Column(
               children: [
                 // Search Bar
@@ -74,7 +74,7 @@ class _FleetScreenState extends State<FleetScreen> {
                     decoration: InputDecoration(
                       hintText: 'Search by plate, customer, or phone...',
                       hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
-                      prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFFF59E0B), size: 20),
+                      prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF64748B), size: 20),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -87,7 +87,7 @@ class _FleetScreenState extends State<FleetScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFF59E0B)),
+                        borderSide: const BorderSide(color: Color(0xFF0F172A)),
                       ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     ),
@@ -98,13 +98,13 @@ class _FleetScreenState extends State<FleetScreen> {
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: _loadCustomers,
-                    color: const Color(0xFFF59E0B),
+                    color: const Color(0xFF0F172A),
                     child: filtered.isEmpty
                         ? const Center(
                             child: Text('No customers found.', style: TextStyle(color: Color(0xFF64748B))),
                           )
                         : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
                             itemCount: filtered.length,
                             itemBuilder: (context, idx) {
                               final c = filtered[idx];
@@ -219,16 +219,16 @@ class _FleetScreenState extends State<FleetScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981),
+                          color: const Color(0xFF0F172A),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
-                            BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 2)),
+                            BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, 2)),
                           ],
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Icon(Icons.chat_bubble_outline_rounded, size: 14, color: Colors.white),
+                            Icon(Icons.chat_bubble_outline_rounded, size: 14, color: Color(0xFF22C55E)),
                             SizedBox(width: 4),
                             Text('WhatsApp', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                           ],
